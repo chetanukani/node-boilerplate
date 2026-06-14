@@ -90,6 +90,7 @@ app.use(morganMiddleware);
 // api routes
 import { errorHandler } from "./middlewares/error.middlewares.js";
 import userRouter from './routes/user.routes.js'
+import categoryRouter from './routes/category.routes.js'
 
 // * Root health check so that hitting "/" reports service health
 app.get("/", (req, res) => {
@@ -100,6 +101,7 @@ app.get("/", (req, res) => {
 
 // * App apis
 app.use("/api/v1/users", userRouter);
+app.use("/api/v1/categories", categoryRouter);
 
 
 // "Route not found" catch-all for any request that did not match a route above.
