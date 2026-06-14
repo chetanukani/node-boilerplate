@@ -3,37 +3,28 @@ import cors from "cors";
 import express from "express";
 import { rateLimit } from "express-rate-limit";
 import session from "express-session";
-import fs from "fs";
 import { createServer } from "http";
-import path from "path";
 import passport from "passport";
 import requestIp from "request-ip";
 import { Server } from "socket.io";
-import swaggerUi from "swagger-ui-express";
-import { fileURLToPath } from "url";
-import YAML from "yaml";
-import { DB_NAME } from "./constants.js";
-import { dbInstance } from "./db/index.js";
 import morganMiddleware from "./logger/morgan.logger.js";
-// import { initializeSocketIO } from "./socket/index.js";
 import { ApiError } from "./utils/ApiError.js";
 import { ApiResponse } from "./utils/ApiResponse.js";
-import { asyncHandler } from "./utils/asyncHandler.js";
-import logger from "./logger/winston.logger.js";
+// import { initializeSocketIO } from "./socket/index.js";
 
 const app = express();
 const httpServer = createServer(app);
 
-const io = new Server(httpServer, {
-  pingTimeout: 60000,
-  cors: {
-    origin: process.env.CORS_ORIGIN,
-    credentials: true,
-  },
-});
+// const io = new Server(httpServer, {
+//   pingTimeout: 60000,
+//   cors: {
+//     origin: process.env.CORS_ORIGIN,
+//     credentials: true,
+//   },
+// });
 
 // using set method to mount the `io` instance on the app to avoid usage of `global`
-app.set("io", io);
+// app.set("io", io);
 
 // global middlewares
 app.use(
@@ -105,6 +96,9 @@ app.get("/", (req, res) => {
 app.use("/api/v1/users", userRouter);
 app.use("/api/v1/categories", categoryRouter);
 app.use("/api/v1/products", productRouter);
+
+// * SocketIo Initialization
+// initializeSocketIO(io);
 
 // "Route not found" catch-all for any request that did not match a route above.
 // Placed after all routes and Swagger so unmatched paths return a consistent JSON
