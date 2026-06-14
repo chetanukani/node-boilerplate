@@ -4,9 +4,15 @@
   "type": "module",
   "main": "src/index.js",
   "scripts": {
-    "start": "nodemon -r dotenv/config --experimental-json-modules src/index.js",
-    "pre-commit": "lint-staged",
-    "prepare": "node prepare.js"
+    "start": "node src/index.js",
+    "dev": "nodemon -r dotenv/config src/index.js",
+    "format": "prettier --write \"**/*.{js,json,md}\"",
+    "format:check": "prettier --check \"**/*.{js,json,md}\"",
+    "lint:staged": "lint-staged",
+    "prepare": "husky install"
+  },
+  "engines": {
+    "node": ">=22"
   },
   "keywords": [],
   "author": "",

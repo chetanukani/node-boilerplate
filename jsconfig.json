@@ -6,6 +6,6 @@
     "allowJs": true,
     "checkJs": false
   },
-  "include": ["src/**/*.js", "prepare.js"],
+  "include": ["src/**/*.js"],
   "exclude": ["node_modules", "examples"]
 }

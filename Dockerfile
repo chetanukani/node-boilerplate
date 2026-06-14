@@ -7,15 +7,15 @@ WORKDIR /usr/src/freeapi
 # Copy package json and yarn lock only to optimise the image building
 COPY package.json yarn.lock ./
 
-# copy prepare.js prior. It will be executed after package installation and before ROOT dir is cloned
-COPY prepare.js ./
-
 USER node
 
-RUN yarn install --pure-lockfile
+ENV HUSKY=0
+ENV NODE_ENV=production
+
+RUN yarn install --frozen-lockfile --production
 
 COPY --chown=node:node . .
 
 EXPOSE 8080
 
-CMD [ "npm", "start" ]
+CMD ["node", "src/index.js"]
