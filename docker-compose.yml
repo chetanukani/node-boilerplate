@@ -1,14 +1,14 @@
-version: '3.8'
+version: "3.8"
 
 services:
   backend:
-    image: freeapi-server
+    image: node_boilerplate-server
     build: .
     ports:
       - 8080:8080
     volumes:
-      - ./:/usr/src/freeapi
-      - /usr/src/freeapi/node_modules
+      - ./:/usr/src/node_boilerplate
+      - /usr/src/node_boilerplate/node_modules
     env_file:
       - ./.env
     depends_on:

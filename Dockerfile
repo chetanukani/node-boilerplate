@@ -1,8 +1,8 @@
 FROM node:22.16.0-alpine
 
-RUN mkdir -p /usr/src/freeapi && chown -R node:node /usr/src/freeapi
+RUN mkdir -p /usr/src/node_boilerplate && chown -R node:node /usr/src/node_boilerplate
 
-WORKDIR /usr/src/freeapi
+WORKDIR /usr/src/node_boilerplate
 
 # Copy package json and yarn lock only to optimise the image building
 COPY package.json yarn.lock ./
