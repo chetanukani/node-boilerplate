@@ -1,70 +1,78 @@
-import { Category } from "../../models/category.models.js";
+import CategoryService from "../../db/services/category.services.js";
+import { ResponseMessages, ValidationMessages } from "../../constants.js";
 import { ApiError } from "../../utils/ApiError.js";
 import { ApiResponse } from "../../utils/ApiResponse.js";
 import { asyncHandler } from "../../utils/asyncHandler.js";
 
 const createCategory = asyncHandler(async (req, res) => {
-    const { name } = req.body
-    const category = await Category.create({
-        name
-    })
-    return res.status(201).json(new ApiResponse(200, category, 'Category created successfully'))
-})
+  const { name } = req.body;
+
+  const category = await CategoryService.addCategory({ name });
+  return res
+    .status(201)
+    .json(new ApiResponse(200, category, ResponseMessages.CREATED));
+});
 
 const listCategories = asyncHandler(async (req, res) => {
-    const categories = await Category.find()
-    return res.status(201).json(new ApiResponse(200, categories, 'Categories fetched successfully'))
-})
+  const categories = await CategoryService.listCategory(req.query)
+    .withName()
+    .withId()
+    .execute();
+  return res
+    .status(200)
+    .json(new ApiResponse(200, categories, ResponseMessages.FETCHED));
+});
 
 const getCategoryById = asyncHandler(async (req, res) => {
-    const { categoryId } = req.params;
-    const category = await Category.findById(categoryId);
-    if (!category) {
-        throw new ApiError(404, "Category does not exist");
-    }
-    return res
-        .status(200)
-        .json(new ApiResponse(200, category, "Category fetched successfully"));
+  const { categoryId } = req.params;
+  const category = await CategoryService.getCategoryById(categoryId)
+    .withName()
+    .withId()
+    .execute();
+  if (!category) {
+    throw new ApiError(404, ValidationMessages.RecordNotFound);
+  }
+  return res
+    .status(200)
+    .json(new ApiResponse(200, category, ResponseMessages.FETCHED));
 });
 
 const updateCategory = asyncHandler(async (req, res) => {
-    const { categoryId } = req.params;
-    const { name } = req.body;
-    const category = await Category.findByIdAndUpdate(
-        categoryId,
-        {
-            $set: {
-                name,
-            },
-        },
-        { returnDocument: 'after' }
-    );
-    if (!category) {
-        throw new ApiError(404, "Category does not exist");
-    }
+  const { categoryId } = req.params;
+  const { name } = req.body;
+  const category = await CategoryService.updateCategory(categoryId, { name });
+  if (!category) {
+    throw new ApiError(404, ValidationMessages.RecordNotFound);
+  }
 
-    return res
-        .status(200)
-        .json(new ApiResponse(200, category, "Category updated successfully"));
+  return res
+    .status(200)
+    .json(new ApiResponse(200, category, ResponseMessages.UPDATED));
 });
 
 const deleteCategory = asyncHandler(async (req, res) => {
-    const { categoryId } = req.params;
-    const category = await Category.findByIdAndDelete(categoryId);
+  const { categoryId } = req.params;
+  const category = await CategoryService.deleteCategory(categoryId);
 
-    if (!category) {
-        throw new ApiError(404, "Category does not exist");
-    }
+  if (!category) {
+    throw new ApiError(404, ValidationMessages.RecordNotFound);
+  }
 
-    return res
-        .status(200)
-        .json(
-            new ApiResponse(
-                200,
-                { deletedCategory: category },
-                "Category deleted successfully"
-            )
-        );
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(
+        200,
+        { deletedCategory: category },
+        ResponseMessages.DELETED
+      )
+    );
 });
 
-export { createCategory, listCategories, getCategoryById, updateCategory, deleteCategory }
+export {
+  createCategory,
+  listCategories,
+  getCategoryById,
+  updateCategory,
+  deleteCategory,
+};

@@ -35,14 +35,14 @@ const disconnectDB = async () => {
 
 class MongoUtil {
   static newObjectId() {
-    return mongoose.Types.ObjectId();
+    return new mongoose.Types.ObjectId();
   }
 
   static toObjectId(stringId) {
-    return mongoose.Types.ObjectId(stringId);
+    return new mongoose.Types.ObjectId(stringId);
   }
 
-  static isValidObjectID(id) {
+  static isValidObjectId(id) {
     return mongoose.isValidObjectId(id);
   }
 }

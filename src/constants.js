@@ -35,7 +35,6 @@ export const AvailablePaymentProviders = Object.values(PaymentProviderEnum);
  */
 export const CouponTypeEnum = {
   FLAT: "FLAT",
-  // PERCENTAGE: "PERCENTAGE",
 };
 
 export const AvailableCouponTypes = Object.values(CouponTypeEnum);
@@ -101,3 +100,70 @@ export const ChatEventEnum = Object.freeze({
 });
 
 export const AvailableChatEvents = Object.values(ChatEventEnum);
+
+/** MongoDB collection names */
+export const TableNames = {
+  User: "users",
+  Category: "categories",
+  Product: "products",
+};
+
+/**
+ * Field keys used across models, services, and queries.
+ * Add new fields here when introducing a model or projection.
+ */
+export const TableFields = {
+  // Common
+  ID: "_id",
+  createdAt: "createdAt",
+  createdAt: "updatedAt",
+
+  // User
+  avatar: "avatar",
+  username: "username",
+  email: "email",
+  role: "role",
+  password: "password",
+  loginType: "loginType",
+  isEmailVerified: "isEmailVerified",
+  refreshToken: "refreshToken",
+  forgotPasswordToken: "forgotPasswordToken",
+  forgotPasswordExpiry: "forgotPasswordExpiry",
+  emailVerificationToken: "emailVerificationToken",
+  emailVerificationExpiry: "emailVerificationExpiry",
+  url: "url",
+  localPath: "localPath",
+
+  // Category
+  name_: "name",
+
+  // Product
+  category: "category",
+  description: "description",
+  mainImage: "mainImage",
+  price: "price",
+  stock: "stock",
+  subImages: "subImages",
+};
+
+/** Shared validation / error messages */
+export const ValidationMessages = {
+  RecordNotFound: "Record not found",
+  UserAlreadyExist: "User with email or username already exists",
+  SomethingWentWrong: "Something went wrong",
+  InvalidCredentials: "Invalid user credentials",
+  UnAuthorized: "Unauthorized request",
+  NotAllowed: "You are not allowed to perform this action",
+  INVALID_PARAMETERS: "Invalid parameters",
+  DUPLICATE_DATA: "Duplicate data",
+  UNAUTHORIZED: "Please authenticate",
+  SOMETHING_WENT_WRONG: "Something went wrong",
+};
+
+/** Shared success response messages */
+export const ResponseMessages = {
+  CREATED: "Created successfully",
+  UPDATED: "Updated successfully",
+  DELETED: "Deleted successfully",
+  FETCHED: "Fetched successfully",
+};

@@ -1,5 +1,5 @@
-import { Category } from "../../models/category.models.js";
-import { Product } from "../../models/product.models.js";
+import CategoryService from "../../db/services/category.services.js";
+import ProductService from "../../db/services/product.services.js";
 import { ApiError } from "../../utils/ApiError.js";
 import { ApiResponse } from "../../utils/ApiResponse.js";
 import { asyncHandler } from "../../utils/asyncHandler.js";
@@ -12,7 +12,9 @@ import {
 const createProduct = asyncHandler(async (req, res) => {
   const { name, description, category, price, stock } = req.body;
 
-  const categoryToBeAdded = await Category.findById(category);
+  const categoryToBeAdded = await CategoryService.getCategoryById(category)
+    .withName()
+    .execute();
 
   if (!categoryToBeAdded) {
     throw new ApiError(404, "Category does not exist");
@@ -43,7 +45,7 @@ const createProduct = asyncHandler(async (req, res) => {
         })
       : [];
 
-  const product = await Product.create({
+  const product = await ProductService.addProduct({
     name,
     description,
     stock,

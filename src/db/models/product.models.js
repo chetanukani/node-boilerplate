@@ -1,37 +1,37 @@
 import mongoose, { Schema } from "mongoose";
-import { type } from "os";
+import { TableFields, TableNames } from "../../constants.js";
 
 const productSchema = new Schema(
   {
-    category: {
-      ref: "Category",
+    [TableFields.category]: {
+      ref: TableNames.Category,
       required: true,
       type: Schema.Types.ObjectId,
     },
-    description: {
+    [TableFields.description]: {
       required: true,
       type: String,
     },
-    mainImage: {
+    [TableFields.mainImage]: {
       required: true,
       type: {
         url: String,
         localPath: String,
       },
     },
-    name: {
+    [TableFields.name_]: {
       required: true,
       type: String,
     },
-    price: {
+    [TableFields.price]: {
       default: 0,
       type: Number,
     },
-    stock: {
+    [TableFields.stock]: {
       default: 0,
       type: Number,
     },
-    subImages: {
+    [TableFields.subImages]: {
       type: [
         {
           url: String,
@@ -46,4 +46,4 @@ const productSchema = new Schema(
   }
 );
 
-export const Product = mongoose.model("Product", productSchema);
+export const Product = mongoose.model(TableNames.Product, productSchema);
