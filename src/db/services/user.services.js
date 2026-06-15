@@ -37,11 +37,32 @@ class ProjectionBuilder {
     };
 
     this.withBasicInfo = () => {
-      projection[TableFields.name_] = 1;
       projection[TableFields.avatar] = 1;
       projection[TableFields.email] = 1;
       projection[TableFields.username] = 1;
-      projection[TableFields.avatar] = 1;
+      projection[TableFields.role] = 1;
+      return this;
+    };
+
+    this.withPassword = () => {
+      projection[TableFields.password] = 1;
+      return this;
+    };
+
+    this.withLoginType = () => {
+      projection[TableFields.loginType] = 1;
+      return this;
+    };
+
+    this.withRole = () => {
+      projection[TableFields.role] = 1;
+      return this;
+    };
+
+    this.withAuthTokens = () => {
+      projection[TableFields.email] = 1;
+      projection[TableFields.username] = 1;
+      projection[TableFields.role] = 1;
       return this;
     };
 

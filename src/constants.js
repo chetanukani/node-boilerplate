@@ -116,7 +116,7 @@ export const TableFields = {
   // Common
   ID: "_id",
   createdAt: "createdAt",
-  createdAt: "updatedAt",
+  updatedAt: "updatedAt",
 
   // User
   avatar: "avatar",
@@ -154,10 +154,7 @@ export const ValidationMessages = {
   InvalidCredentials: "Invalid user credentials",
   UnAuthorized: "Unauthorized request",
   NotAllowed: "You are not allowed to perform this action",
-  INVALID_PARAMETERS: "Invalid parameters",
-  DUPLICATE_DATA: "Duplicate data",
-  UNAUTHORIZED: "Please authenticate",
-  SOMETHING_WENT_WRONG: "Something went wrong",
+  ImageRequired: "Main image is required",
 };
 
 /** Shared success response messages */
@@ -166,4 +163,7 @@ export const ResponseMessages = {
   UPDATED: "Updated successfully",
   DELETED: "Deleted successfully",
   FETCHED: "Fetched successfully",
+  LoginSuccess: "User logged in successfully",
+  ProfileFetchSuccess: "Profile fetched successful",
+  ProductCreatedSuccess: "Product created successfully",
 };

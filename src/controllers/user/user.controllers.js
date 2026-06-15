@@ -14,14 +14,19 @@ import UserService from "../../db/services/user.services.js";
 
 const generateAccessAndRefreshTokens = async (userId) => {
   try {
-    const user = await UserService.findUserById(userId).withId().execute();
+    const user = await UserService.findUserById(userId)
+      .withId()
+      .withAuthTokens()
+      .execute();
     if (!user) {
       throw new ApiError(400, ValidationMessages.RecordNotFound);
     }
     const accessToken = user.generateAccessToken();
     const refreshToken = user.generateRefreshToken();
 
-    await UserService.updateUser({ refreshToken });
+    await UserService.updateUser(userId, {
+      $set: { refreshToken },
+    });
     return { accessToken, refreshToken };
   } catch (error) {
     throw new ApiError(500, ValidationMessages.SomethingWentWrong);
@@ -75,15 +80,14 @@ const loginUser = asyncHandler(async (req, res) => {
     $or: [{ username }, { email }],
   })
     .withId()
+    .withPassword()
+    .withLoginType()
     .execute();
 
   if (!user) {
     throw new ApiError(404, ValidationMessages.RecordNotFound);
   }
 
-  console.log("user", user);
-
-  // Compare the incoming password with hashed password
   const isPasswordValid = await user.isPasswordCorrect(password);
 
   if (!isPasswordValid) {
@@ -113,7 +117,7 @@ const loginUser = asyncHandler(async (req, res) => {
       new ApiResponse(
         200,
         { user: loggedInUser, accessToken, refreshToken }, // send access and refresh token in response if client decides to save them by themselves
-        "User logged in successfully"
+        ResponseMessages.LoginSuccess
       )
     );
 });
@@ -144,7 +148,7 @@ const getProfile = asyncHandler(async (req, res) => {
     .execute();
   return res
     .status(200)
-    .json(new ApiResponse(200, userData, "Profile fetched successful"));
+    .json(new ApiResponse(200, userData, ResponseMessages.ProfileFetchSuccess));
 });
 
 export { registerUser, loginUser, logoutUser, getProfile };

@@ -1,3 +1,4 @@
+import { ResponseMessages, ValidationMessages } from "../../constants.js";
 import CategoryService from "../../db/services/category.services.js";
 import ProductService from "../../db/services/product.services.js";
 import { ApiError } from "../../utils/ApiError.js";
@@ -17,12 +18,12 @@ const createProduct = asyncHandler(async (req, res) => {
     .execute();
 
   if (!categoryToBeAdded) {
-    throw new ApiError(404, "Category does not exist");
+    throw new ApiError(404, ValidationMessages.RecordNotFound);
   }
 
   // Check if user has uploaded a main image
   if (!req.files?.mainImage || !req.files?.mainImage.length) {
-    throw new ApiError(400, "Main image is required");
+    throw new ApiError(400, ValidationMessages.ImageRequired);
   }
 
   const mainImageUrl = getStaticFilePath(
@@ -59,7 +60,9 @@ const createProduct = asyncHandler(async (req, res) => {
   });
   return res
     .status(201)
-    .json(new ApiResponse(201, product, "Product created successfully"));
+    .json(
+      new ApiResponse(201, product, ResponseMessages.ProductCreatedSuccess)
+    );
 });
 
 export { createProduct };

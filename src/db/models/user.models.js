@@ -10,6 +10,7 @@ import {
   UserRolesEnum,
   TableFields,
   TableNames,
+  ValidationMessages,
 } from "../../constants.js";
 
 const userSchema = new Schema(
@@ -47,7 +48,7 @@ const userSchema = new Schema(
     },
     [TableFields.password]: {
       type: String,
-      required: [true, "Password is required"],
+      required: [true, ValidationMessages.P],
     },
     [TableFields.loginType]: {
       type: String,
@@ -74,7 +75,18 @@ const userSchema = new Schema(
       type: Date,
     },
   },
-  { timestamps: true }
+  {
+    timestamps: true,
+    toJSON: {
+      transform: function (doc, ret) {
+        delete ret[TableFields.emailVerificationToken];
+        delete ret[TableFields.forgotPasswordToken];
+        delete ret[TableFields.password];
+        delete ret[TableFields.refreshToken];
+        delete ret.__v;
+      },
+    },
+  }
 );
 
 userSchema.pre("save", async function () {
