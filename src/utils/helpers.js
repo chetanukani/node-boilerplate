@@ -1,5 +1,6 @@
 import fs from "fs";
 import mongoose from "mongoose";
+import S3Service from "../utils/s3.js";
 import logger from "../logger/winston.logger.js";
 
 /**
@@ -44,17 +45,17 @@ import logger from "../logger/winston.logger.js";
  * ```
  */
 export const filterObjectKeys = (fieldsArray, objectArray) => {
-    const filteredArray = structuredClone(objectArray).map((originalObj) => {
-        let obj = {};
-        structuredClone(fieldsArray)?.forEach((field) => {
-            if (field?.trim() in originalObj) {
-                obj[field] = originalObj[field];
-            }
-        });
-        if (Object.keys(obj).length > 0) return obj;
-        return originalObj;
+  const filteredArray = structuredClone(objectArray).map((originalObj) => {
+    let obj = {};
+    structuredClone(fieldsArray)?.forEach((field) => {
+      if (field?.trim() in originalObj) {
+        obj[field] = originalObj[field];
+      }
     });
-    return filteredArray;
+    if (Object.keys(obj).length > 0) return obj;
+    return originalObj;
+  });
+  return filteredArray;
 };
 
 /**
@@ -65,27 +66,27 @@ export const filterObjectKeys = (fieldsArray, objectArray) => {
  * @returns {{previousPage: string | null, currentPage: string, nextPage: string | null, data: any[]}}
  */
 export const getPaginatedPayload = (dataArray, page, limit) => {
-    const startPosition = +(page - 1) * limit;
+  const startPosition = +(page - 1) * limit;
 
-    const totalItems = dataArray.length; // total documents present after applying search query
-    const totalPages = Math.ceil(totalItems / limit);
+  const totalItems = dataArray.length; // total documents present after applying search query
+  const totalPages = Math.ceil(totalItems / limit);
 
-    dataArray = structuredClone(dataArray).slice(
-        startPosition,
-        startPosition + limit
-    );
+  dataArray = structuredClone(dataArray).slice(
+    startPosition,
+    startPosition + limit
+  );
 
-    const payload = {
-        page,
-        limit,
-        totalPages,
-        previousPage: page > 1,
-        nextPage: page < totalPages,
-        totalItems,
-        currentPageItems: dataArray?.length,
-        data: dataArray,
-    };
-    return payload;
+  const payload = {
+    page,
+    limit,
+    totalPages,
+    previousPage: page > 1,
+    nextPage: page < totalPages,
+    totalItems,
+    currentPageItems: dataArray?.length,
+    data: dataArray,
+  };
+  return payload;
 };
 
 /**
@@ -95,7 +96,7 @@ export const getPaginatedPayload = (dataArray, page, limit) => {
  * @description returns the file's static path from where the server is serving the static image
  */
 export const getStaticFilePath = (req, fileName) => {
-    return `${req.protocol}://${req.get("host")}/images/${fileName}`;
+  return `${req.protocol}://${req.get("host")}/images/${fileName}`;
 };
 
 /**
@@ -104,7 +105,7 @@ export const getStaticFilePath = (req, fileName) => {
  * @description returns the file's local path in the file system to assist future removal
  */
 export const getLocalPath = (fileName) => {
-    return `public/images/${fileName}`;
+  return `public/images/${fileName}`;
 };
 
 /**
@@ -113,12 +114,32 @@ export const getLocalPath = (fileName) => {
  * @description Removed the local file from the local file system based on the file path
  */
 export const removeLocalFile = (localPath) => {
-    fs.unlink(localPath, (err) => {
-        if (err) logger.error("Error while removing local files: ", err);
-        else {
-            logger.info("Removed local: ", localPath);
-        }
+  if (!localPath) return;
+
+  fs.unlink(localPath, (err) => {
+    if (err) logger.error("Error while removing local files: ", err);
+    else {
+      logger.info("Removed local: ", localPath);
+    }
+  });
+};
+
+export const removeUnusedS3FileUploadsOnError = (req) => {
+  try {
+    if (!S3Service.isEnabled()) return;
+
+    const s3Keys = req.uploadedFileKeys;
+    if (!Array.isArray(s3Keys) || s3Keys.length === 0) return;
+
+    s3Keys.forEach((key) => {
+      if (!key) return;
+      S3Service.deleteFile(key).catch((error) => {
+        logger.error("Error while removing S3 file after error:", error);
+      });
     });
+  } catch (error) {
+    logger.error("Error while removing S3 uploaded files on error:", error);
+  }
 };
 
 /**
@@ -132,31 +153,33 @@ export const removeLocalFile = (localPath) => {
  * * In such case, this function will remove those unused images.
  */
 export const removeUnusedMulterImageFilesOnError = (req) => {
-    try {
-        const multerFile = req.file;
-        const multerFiles = req.files;
+  try {
+    const multerFile = req.file;
+    const multerFiles = req.files;
 
-        if (multerFile) {
-            // If there is file uploaded and there is validation error
-            // We want to remove that file
-            removeLocalFile(multerFile.path);
-        }
-
-        if (multerFiles) {
-            /** @type {Express.Multer.File[][]}  */
-            const filesValueArray = Object.values(multerFiles);
-            // If there are multiple files uploaded for more than one fields
-            // We want to remove those files as well
-            filesValueArray.map((fileFields) => {
-                fileFields.map((fileObject) => {
-                    removeLocalFile(fileObject.path);
-                });
-            });
-        }
-    } catch (error) {
-        // fail silently
-        logger.error("Error while removing image files: ", error);
+    if (multerFile && multerFile.path) {
+      // If there is file uploaded and there is validation error
+      // We want to remove that file
+      removeLocalFile(multerFile.path);
     }
+
+    if (multerFiles) {
+      /** @type {Express.Multer.File[][]}  */
+      const filesValueArray = Object.values(multerFiles);
+      // If there are multiple files uploaded for more than one fields
+      // We want to remove those files as well
+      filesValueArray.forEach((fileFields) => {
+        fileFields.forEach((fileObject) => {
+          if (fileObject?.path) {
+            removeLocalFile(fileObject.path);
+          }
+        });
+      });
+    }
+  } catch (error) {
+    // fail silently
+    logger.error("Error while removing image files: ", error);
+  }
 };
 
 /**
@@ -165,24 +188,24 @@ export const removeUnusedMulterImageFilesOnError = (req) => {
  * @returns {mongoose.PaginateOptions}
  */
 export const getMongoosePaginationOptions = ({
-    page = 1,
-    limit = 10,
-    customLabels,
+  page = 1,
+  limit = 10,
+  customLabels,
 }) => {
-    return {
-        page: Math.max(page, 1),
-        limit: Math.max(limit, 1),
-        pagination: true,
-        customLabels: {
-            pagingCounter: "serialNumberStartFrom",
-            ...customLabels,
-        },
-    };
+  return {
+    page: Math.max(page, 1),
+    limit: Math.max(limit, 1),
+    pagination: true,
+    customLabels: {
+      pagingCounter: "serialNumberStartFrom",
+      ...customLabels,
+    },
+  };
 };
 
 /**
  * @param {number} max Ceil threshold (exclusive)
  */
 export const getRandomNumber = (max) => {
-    return Math.floor(Math.random() * max);
+  return Math.floor(Math.random() * max);
 };

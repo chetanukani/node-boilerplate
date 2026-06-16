@@ -3,7 +3,10 @@ import mongoose from "mongoose";
 import logger from "../logger/winston.logger.js";
 import { ApiError } from "../utils/ApiError.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
-import { removeUnusedMulterImageFilesOnError } from "../utils/helpers.js";
+import {
+  removeUnusedMulterImageFilesOnError,
+  removeUnusedS3FileUploadsOnError,
+} from "../utils/helpers.js";
 import { ValidationMessages } from "../constants.js";
 
 /**
@@ -43,6 +46,7 @@ const errorHandler = (err, req, res, next) => {
   logger.error(`${error.message}`);
 
   removeUnusedMulterImageFilesOnError(req);
+  removeUnusedS3FileUploadsOnError(req);
   // Send error response
   return res.status(error.statusCode).json(response);
 };
