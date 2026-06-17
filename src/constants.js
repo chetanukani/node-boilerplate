@@ -155,6 +155,7 @@ export const ValidationMessages = {
   UnAuthorized: "Unauthorized request",
   NotAllowed: "You are not allowed to perform this action",
   ImageRequired: "Main image is required",
+  InvalidAurTokenExpired: "Invalid or expired password reset token",
 };
 
 /** Shared success response messages */
@@ -166,4 +167,7 @@ export const ResponseMessages = {
   LoginSuccess: "User logged in successfully",
   ProfileFetchSuccess: "Profile fetched successful",
   ProductCreatedSuccess: "Product created successfully",
+  PasswordResetEmailSent:
+    "If an account exists, password reset instructions have been sent.",
+  PasswordResetSuccess: "Password has been reset successfully",
 };

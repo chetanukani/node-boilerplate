@@ -20,6 +20,18 @@ class UserService {
     });
   };
 
+  static findByForgotToken = (hashedToken) => {
+    return new ProjectionBuilder(async function () {
+      return await User.findOne(
+        {
+          forgotPasswordToken: hashedToken,
+          forgotPasswordExpiry: { $gt: Date.now() },
+        },
+        this
+      );
+    });
+  };
+
   static updateUser = async (userId, updatedFields) => {
     await User.findByIdAndUpdate(userId, {
       ...updatedFields,

@@ -12,6 +12,7 @@ import { ApiResponse } from "../../utils/ApiResponse.js";
 import { asyncHandler } from "../../utils/asyncHandler.js";
 import UserService from "../../db/services/user.services.js";
 import SessionService from "../../db/services/session.services.js";
+import { sendEmail, forgotPasswordMailgenContent } from "../../utils/mail.js";
 
 const hashToken = (token) =>
   crypto.createHash("sha256").update(token).digest("hex");
@@ -234,6 +235,80 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
     );
 });
 
+const forgotPassword = asyncHandler(async (req, res) => {
+  const { email } = req.body;
+  if (!email) throw new ApiError(400, ValidationMessages.SomethingWentWrong);
+
+  const user = await UserService.findUserByUserNameOrEmail({ email })
+    .withId()
+    .withBasicInfo()
+    .execute();
+
+  // Always respond with success to avoid user enumeration
+  if (!user) {
+    return res
+      .status(200)
+      .json(new ApiResponse(200, {}, ResponseMessages.PasswordResetEmailSent));
+  }
+
+  // generate temporary token using model helper
+  const { unHashedToken, hashedToken, tokenExpiry } =
+    user.generateTemporaryToken();
+
+  await UserService.updateUser(user._id, {
+    $set: {
+      forgotPasswordToken: hashedToken,
+      forgotPasswordExpiry: new Date(tokenExpiry),
+    },
+  });
+
+  const resetUrlBase =
+    process.env.FRONTEND_URL || `${req.protocol}://${req.get("host")}`;
+  const passwordResetUrl = `${resetUrlBase}/reset-password?token=${unHashedToken}`;
+
+  // send email (failure to send email shouldn't block response)
+  sendEmail({
+    email: user.email,
+    subject: "Password reset instructions",
+    mailgenContent: forgotPasswordMailgenContent(
+      user.username || user.email,
+      passwordResetUrl
+    ),
+  });
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, {}, ResponseMessages.PasswordResetEmailSent));
+});
+
+const resetPassword = asyncHandler(async (req, res) => {
+  const { token, password } = req.body;
+  if (!token || !password)
+    throw new ApiError(400, ValidationMessages.SomethingWentWrong);
+
+  const tokenHash = crypto.createHash("sha256").update(token).digest("hex");
+  const user = await UserService.findByForgotToken(tokenHash)
+    .withId()
+    .withPassword()
+    .execute();
+
+  if (!user) {
+    throw new ApiError(400, ValidationMessages.InvalidAurTokenExpired);
+  }
+
+  user.password = password;
+  user.forgotPasswordToken = undefined;
+  user.forgotPasswordExpiry = undefined;
+  await user.save();
+
+  // revoke all sessions after password change
+  await SessionService.revokeAllForUser(user._id);
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, {}, ResponseMessages.PasswordResetSuccess));
+});
+
 const logoutUser = asyncHandler(async (req, res) => {
   // try to revoke the session identified by the refresh token present in cookie
   const token =
@@ -306,4 +381,6 @@ export {
   refreshAccessToken,
   logoutAllSessions,
   listSessions,
+  forgotPassword,
+  resetPassword,
 };

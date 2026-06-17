@@ -13,6 +13,10 @@ import {
   getProfile,
 } from "../controllers/user/user.controllers.js";
 import {
+  forgotPassword,
+  resetPassword,
+} from "../controllers/user/user.controllers.js";
+import {
   refreshAccessToken,
   logoutAllSessions,
   listSessions,
@@ -29,5 +33,7 @@ router.route("/profile").get(verifyJWT, getProfile);
 router.route("/refresh-token").post(refreshAccessToken);
 router.route("/sessions").get(verifyJWT, listSessions);
 router.route("/logout-all").post(verifyJWT, logoutAllSessions);
+router.route("/forgot-password").post(forgotPassword);
+router.route("/reset-password").post(resetPassword);
 
 export default router;
