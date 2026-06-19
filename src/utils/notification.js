@@ -1,10 +1,7 @@
-import fs from "fs";
-// import admin from "firebase-admin";
 import { initializeApp, getApps, cert } from "firebase-admin/app";
 import { getMessaging } from "firebase-admin/messaging";
 const FCM_MAX_TOKEN_LIMIT = 499; // (actual limit is 500)
 
-let initialized = false;
 let admin;
 
 export function initFirebaseAdmin() {
@@ -89,7 +86,6 @@ export async function sendNotificationToTokens(
         }
       });
     } catch (err) {
-      console.log(err);
       results.errors.push({ error: err });
     }
   }
