@@ -11,12 +11,9 @@ import {
   loginUser,
   logoutUser,
   getProfile,
-} from "../controllers/user/user.controllers.js";
-import {
+  simulateNotification,
   forgotPassword,
   resetPassword,
-} from "../controllers/user/user.controllers.js";
-import {
   refreshAccessToken,
   logoutAllSessions,
   listSessions,
@@ -35,5 +32,7 @@ router.route("/sessions").get(verifyJWT, listSessions);
 router.route("/logout-all").post(verifyJWT, logoutAllSessions);
 router.route("/forgot-password").post(forgotPassword);
 router.route("/reset-password").post(resetPassword);
+
+router.route("/simulate").post(verifyJWT, simulateNotification);
 
 export default router;

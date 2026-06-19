@@ -11,6 +11,7 @@ import {
   TableFields,
   TableNames,
   ValidationMessages,
+  FCMPlatformType,
 } from "../../constants.js";
 
 const userSchema = new Schema(
@@ -74,6 +75,16 @@ const userSchema = new Schema(
     [TableFields.emailVerificationExpiry]: {
       type: Date,
     },
+    [TableFields.fcmTokens]: [
+      {
+        _id: false,
+        [TableFields.token]: String,
+        [TableFields.platform]: {
+          type: Number,
+          enum: Object.values(FCMPlatformType),
+        },
+      },
+    ],
   },
   {
     timestamps: true,
@@ -138,6 +149,46 @@ userSchema.methods.generateTemporaryToken = function () {
   const tokenExpiry = Date.now() + USER_TEMPORARY_TOKEN_EXPIRY;
 
   return { unHashedToken, hashedToken, tokenExpiry };
+};
+
+/**
+ * Add or update a device token for multi-device push notifications
+ * @param {{token: string, deviceId?: string, platform?: string}} tokenObj
+ */
+userSchema.methods.addDeviceToken = async function (tokenObj) {
+  if (!tokenObj || !tokenObj.token) return this;
+  const existingIndex = this.deviceTokens.findIndex(
+    (t) =>
+      t.token === tokenObj.token ||
+      (tokenObj.deviceId && t.deviceId === tokenObj.deviceId)
+  );
+  const now = new Date();
+  if (existingIndex > -1) {
+    this.deviceTokens[existingIndex] = {
+      token: tokenObj.token,
+      deviceId: tokenObj.deviceId || this.deviceTokens[existingIndex].deviceId,
+      platform: tokenObj.platform || this.deviceTokens[existingIndex].platform,
+      lastSeen: now,
+    };
+  } else {
+    this.deviceTokens.push({
+      token: tokenObj.token,
+      deviceId: tokenObj.deviceId || null,
+      platform: tokenObj.platform || null,
+      lastSeen: now,
+    });
+  }
+  return this.save();
+};
+
+/**
+ * Remove device token by token string
+ * @param {string} token
+ */
+userSchema.methods.removeDeviceToken = async function (token) {
+  if (!token) return this;
+  this.deviceTokens = this.deviceTokens.filter((t) => t.token !== token);
+  return this.save();
 };
 
 export const User = mongoose.model(TableNames.User, userSchema);

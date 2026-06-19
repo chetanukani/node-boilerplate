@@ -12,7 +12,7 @@
     "prepare": "husky install"
   },
   "engines": {
-    "node": ">=22"
+    "node": ">=24"
   },
   "keywords": [],
   "author": "",
@@ -31,6 +31,7 @@
     "express-rate-limit": "^8.5.2",
     "express-session": "^1.19.0",
     "express-validator": "^7.3.2",
+    "firebase-admin": "^14.0.0",
     "jsonwebtoken": "^9.0.3",
     "mailgen": "^2.0.34",
     "mongoose": "^9.7.0",

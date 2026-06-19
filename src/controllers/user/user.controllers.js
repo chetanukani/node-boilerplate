@@ -12,6 +12,7 @@ import { ApiResponse } from "../../utils/ApiResponse.js";
 import { asyncHandler } from "../../utils/asyncHandler.js";
 import UserService from "../../db/services/user.services.js";
 import SessionService from "../../db/services/session.services.js";
+import NotificationService from "../../db/services/notification/notification.services.js";
 import { sendEmail, forgotPasswordMailgenContent } from "../../utils/mail.js";
 
 const hashToken = (token) =>
@@ -373,6 +374,21 @@ const getProfile = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, userData, ResponseMessages.ProfileFetchSuccess));
 });
 
+/**
+ * Simulate sending a notification to a user (for testing)
+ * Body: { userId?: string, notification?: {title, body}, data?: object }
+ */
+const simulateNotification = asyncHandler(async (req, res) => {
+  const userId = req.user?.[TableFields.ID];
+  if (!userId) throw new ApiError(400, "userId is required");
+
+  await NotificationService.sendNotificationToUserById(userId);
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, {}, "Notification simulated"));
+});
+
 export {
   registerUser,
   loginUser,
@@ -383,4 +399,5 @@ export {
   listSessions,
   forgotPassword,
   resetPassword,
+  simulateNotification,
 };

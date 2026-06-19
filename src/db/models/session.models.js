@@ -20,4 +20,4 @@ const sessionSchema = new Schema(
   { timestamps: true }
 );
 
-export const Session = mongoose.model("sessions", sessionSchema);
+export const Session = mongoose.model(TableNames.Session, sessionSchema);

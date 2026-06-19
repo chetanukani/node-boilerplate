@@ -106,6 +106,8 @@ export const TableNames = {
   User: "users",
   Category: "categories",
   Product: "products",
+  Notification: "notifications",
+  Session: "sessions",
 };
 
 /**
@@ -131,19 +133,24 @@ export const TableFields = {
   forgotPasswordExpiry: "forgotPasswordExpiry",
   emailVerificationToken: "emailVerificationToken",
   emailVerificationExpiry: "emailVerificationExpiry",
+  deviceTokens: "deviceTokens",
   url: "url",
   localPath: "localPath",
-
-  // Category
   name_: "name",
-
-  // Product
   category: "category",
   description: "description",
   mainImage: "mainImage",
   price: "price",
   stock: "stock",
   subImages: "subImages",
+  user: "user",
+  title: "title",
+  message: "message",
+  type: "type",
+  metadata: "metadata",
+  fcmTokens: "fcmTokens",
+  token: "token",
+  platform: "platform",
 };
 
 /** Shared validation / error messages */
@@ -170,4 +177,9 @@ export const ResponseMessages = {
   PasswordResetEmailSent:
     "If an account exists, password reset instructions have been sent.",
   PasswordResetSuccess: "Password has been reset successfully",
+};
+
+export const FCMPlatformType = {
+  Android: 1,
+  iOS: 2,
 };
