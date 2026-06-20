@@ -68,7 +68,7 @@ export const deleteFile = async (localPath) => {
     await S3Service.deleteFile(localPath);
   } else {
     try {
-      const fullPath = `public/images/${localPath}`;
+      const fullPath = `public/files/${localPath}`;
       fs.unlinkSync(fullPath);
       console.log(`Local file deleted: ${fullPath}`);
     } catch (error) {

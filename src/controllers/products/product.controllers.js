@@ -41,7 +41,7 @@ const createProduct = asyncHandler(async (req, res) => {
   // Upload image
   const mediaFiles = await handleMultipleFilesUpload(
     req.files.media,
-    "productsDemo",
+    "products",
     req
   );
 

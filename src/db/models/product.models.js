@@ -49,7 +49,7 @@ function attachS3Links(ret) {
   const buildUrl = (url) => {
     if (!url) return null;
     if (S3Service.isEnabled()) return S3Service.getUrl(url);
-    return `${process.env.HOST_URL}/images/${url}`;
+    return `${process.env.HOST_URL}/files/${url}`;
   };
 
   if (ret[TableFields.media] && Array.isArray(ret[TableFields.media])) {
