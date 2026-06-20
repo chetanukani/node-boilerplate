@@ -389,6 +389,10 @@ const simulateNotification = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, {}, "Notification simulated"));
 });
 
+const testingAppSetting = asyncHandler(async (req, res, next) => {
+  return res.status(200).json(new ApiResponse(200, {}, "App setting tested"));
+});
+
 export {
   registerUser,
   loginUser,
@@ -400,4 +404,5 @@ export {
   forgotPassword,
   resetPassword,
   simulateNotification,
+  testingAppSetting,
 };

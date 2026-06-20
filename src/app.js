@@ -10,6 +10,8 @@ import { Server } from "socket.io";
 import morganMiddleware from "./logger/morgan.logger.js";
 import { ApiError } from "./utils/ApiError.js";
 import { ApiResponse } from "./utils/ApiResponse.js";
+import versionMiddleware from "./middlewares/version.middlewares.js";
+import appVersionRouter from "./routes/appVersion.routes.js";
 // import { initializeSocketIO } from "./socket/index.js";
 
 const app = express();
@@ -93,6 +95,11 @@ app.get("/", (req, res) => {
 });
 
 // * App apis
+// Admin / management endpoints for app version config (mounted before version checks)
+app.use("/api/v1/app-versions", appVersionRouter);
+
+// Version check for mobile apps (applies to all /api/v1 routes)
+app.use("/api/v1", versionMiddleware);
 app.use("/api/v1/users", userRouter);
 app.use("/api/v1/categories", categoryRouter);
 app.use("/api/v1/products", productRouter);

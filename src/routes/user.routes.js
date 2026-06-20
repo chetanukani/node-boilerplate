@@ -17,6 +17,7 @@ import {
   refreshAccessToken,
   logoutAllSessions,
   listSessions,
+  testingAppSetting,
 } from "../controllers/user/user.controllers.js";
 import { verifyJWT } from "../middlewares/auth.middlewares.js";
 
@@ -34,5 +35,6 @@ router.route("/forgot-password").post(forgotPassword);
 router.route("/reset-password").post(resetPassword);
 
 router.route("/simulate").post(verifyJWT, simulateNotification);
+router.route("/testing-app-setting").get(testingAppSetting);
 
 export default router;

@@ -179,7 +179,7 @@ export const ResponseMessages = {
   PasswordResetSuccess: "Password has been reset successfully",
 };
 
-export const FCMPlatformType = {
-  Android: 1,
-  iOS: 2,
+export const PlatformType = {
+  Android: "android",
+  iOS: "ios",
 };

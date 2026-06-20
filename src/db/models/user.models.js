@@ -11,7 +11,7 @@ import {
   TableFields,
   TableNames,
   ValidationMessages,
-  FCMPlatformType,
+  PlatformType,
 } from "../../constants.js";
 
 const userSchema = new Schema(
@@ -80,8 +80,8 @@ const userSchema = new Schema(
         _id: false,
         [TableFields.token]: String,
         [TableFields.platform]: {
-          type: Number,
-          enum: Object.values(FCMPlatformType),
+          type: String,
+          enum: Object.values(PlatformType),
         },
       },
     ],
