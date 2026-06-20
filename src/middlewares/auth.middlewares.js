@@ -3,6 +3,7 @@ import UserService from "../db/services/user.services.js";
 import { ApiError } from "../utils/ApiError.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import jwt from "jsonwebtoken";
+import { StatusCodes } from "http-status-codes";
 
 export const verifyJWT = asyncHandler(async (req, res, next) => {
   const token =
@@ -10,7 +11,10 @@ export const verifyJWT = asyncHandler(async (req, res, next) => {
     req.header("Authorization")?.replace("Bearer ", "");
 
   if (!token) {
-    throw new ApiError(401, ValidationMessages.UnAuthorized);
+    throw new ApiError(
+      StatusCodes.UNAUTHORIZED,
+      ValidationMessages.UnAuthorized
+    );
   }
 
   try {
@@ -21,14 +25,20 @@ export const verifyJWT = asyncHandler(async (req, res, next) => {
     if (!user) {
       // Client should make a request to /api/v1/users/refresh-token if they have refreshToken present in their cookie
       // Then they will get a new access token which will allow them to refresh the access token without logging out the user
-      throw new ApiError(401, ValidationMessages.UnAuthorized);
+      throw new ApiError(
+        StatusCodes.UNAUTHORIZED,
+        ValidationMessages.UnAuthorized
+      );
     }
     req.user = user;
     next();
   } catch (error) {
     // Client should make a request to /api/v1/users/refresh-token if they have refreshToken present in their cookie
     // Then they will get a new access token which will allow them to refresh the access token without logging out the user
-    throw new ApiError(401, error?.message || ValidationMessages.UnAuthorized);
+    throw new ApiError(
+      StatusCodes.UNAUTHORIZED,
+      error?.message || ValidationMessages.UnAuthorized
+    );
   }
 });
 
@@ -65,12 +75,15 @@ export const getLoggedInUserOrIgnore = asyncHandler(async (req, res, next) => {
 export const verifyPermission = (roles = []) =>
   asyncHandler(async (req, res, next) => {
     if (!req.user?._id) {
-      throw new ApiError(401, ValidationMessages.UnAuthorized);
+      throw new ApiError(
+        StatusCodes.UNAUTHORIZED,
+        ValidationMessages.UnAuthorized
+      );
     }
     if (roles.includes(req.user?.role)) {
       next();
     } else {
-      throw new ApiError(403, ValidationMessages.NotAllowed);
+      throw new ApiError(StatusCodes.FORBIDDEN, ValidationMessages.NotAllowed);
     }
   });
 
@@ -79,8 +92,8 @@ export const avoidInProduction = asyncHandler(async (req, res, next) => {
     next();
   } else {
     throw new ApiError(
-      403,
-      "This service is only available in the local environment"
+      StatusCodes.FORBIDDEN,
+      ValidationMessages.DevOnlyService
     );
   }
 });

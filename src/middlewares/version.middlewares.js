@@ -1,5 +1,6 @@
 import semver from "semver";
 import { ApiError } from "../utils/ApiError.js";
+import { StatusCodes } from "http-status-codes";
 import AppVersionService from "../db/services/appVersion.services.js";
 
 async function versionMiddleware(req, res, next) {
@@ -18,7 +19,10 @@ async function versionMiddleware(req, res, next) {
     if (!cfg) return next();
 
     if (cfg.maintenance) {
-      const err = new ApiError(503, "Service under maintenance");
+      const err = new ApiError(
+        StatusCodes.SERVICE_UNAVAILABLE,
+        "Service under maintenance"
+      );
       err.code = "MAINTENANCE";
       err.data = {
         maintenance: true,
@@ -40,7 +44,10 @@ async function versionMiddleware(req, res, next) {
 
     // If client's version is lower than server version and forceUpdate is true -> force update
     if (serverVer && semver.lt(appVer, serverVer) && cfg.forceUpdate) {
-      const err = new ApiError(426, "Please upgrade your app to continue");
+      const err = new ApiError(
+        StatusCodes.UPGRADE_REQUIRED,
+        "Please upgrade your app to continue"
+      );
       err.code = "FORCE_UPDATE";
       err.data = {
         version: cfg.version,

@@ -1,5 +1,7 @@
+import { ResponseMessages } from "../constants.js";
 import AppVersionService from "../db/services/appVersion.services.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
+import { StatusCodes } from "http-status-codes";
 
 async function updateOrAddAppSettings(req, res, next) {
   try {
@@ -17,8 +19,8 @@ async function updateOrAddAppSettings(req, res, next) {
       payload
     );
     return res
-      .status(200)
-      .json(new ApiResponse(200, doc, "App version upserted"));
+      .status(StatusCodes.OK)
+      .json(new ApiResponse(StatusCodes.OK, doc, ResponseMessages.UPDATED));
   } catch (err) {
     return next(err);
   }
@@ -26,7 +28,9 @@ async function updateOrAddAppSettings(req, res, next) {
 
 async function getAllAppVersion(req, res, next) {
   const records = await AppVersionService.getAllPlatformConfig();
-  return res.status(200).json(new ApiResponse(200, { records }, "Fetched"));
+  return res
+    .status(StatusCodes.OK)
+    .json(new ApiResponse(StatusCodes.OK, { records }, "Fetched"));
 }
 
 export { updateOrAddAppSettings, getAllAppVersion };

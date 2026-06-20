@@ -158,11 +158,13 @@ export const ValidationMessages = {
   RecordNotFound: "Record not found",
   UserAlreadyExist: "User with email or username already exists",
   SomethingWentWrong: "Something went wrong",
+  InvalidData: "Received data is not valid",
   InvalidCredentials: "Invalid user credentials",
   UnAuthorized: "Unauthorized request",
   NotAllowed: "You are not allowed to perform this action",
   ImageRequired: "Main image is required",
   InvalidAurTokenExpired: "Invalid or expired password reset token",
+  DevOnlyService: "This service is only available in the local environment",
 };
 
 /** Shared success response messages */

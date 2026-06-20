@@ -10,6 +10,7 @@ import { Server } from "socket.io";
 import morganMiddleware from "./logger/morgan.logger.js";
 import { ApiError } from "./utils/ApiError.js";
 import { ApiResponse } from "./utils/ApiResponse.js";
+import { StatusCodes } from "http-status-codes";
 import versionMiddleware from "./middlewares/version.middlewares.js";
 import appVersionRouter from "./routes/appVersion.routes.js";
 // import { initializeSocketIO } from "./socket/index.js";
@@ -90,8 +91,8 @@ import productRouter from "./routes/product.routes.js";
 // * Root health check so that hitting "/" reports service health
 app.get("/", (req, res) => {
   return res
-    .status(200)
-    .json(new ApiResponse(200, "OK", "Health check passed"));
+    .status(StatusCodes.OK)
+    .json(new ApiResponse(StatusCodes.OK, "OK", "Health check passed"));
 });
 
 // * App apis

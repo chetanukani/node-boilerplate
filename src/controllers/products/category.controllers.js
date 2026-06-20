@@ -3,14 +3,17 @@ import { ResponseMessages, ValidationMessages } from "../../constants.js";
 import { ApiError } from "../../utils/ApiError.js";
 import { ApiResponse } from "../../utils/ApiResponse.js";
 import { asyncHandler } from "../../utils/asyncHandler.js";
+import { StatusCodes } from "http-status-codes";
 
 const createCategory = asyncHandler(async (req, res) => {
   const { name } = req.body;
 
   const category = await CategoryService.addCategory({ name });
   return res
-    .status(201)
-    .json(new ApiResponse(200, category, ResponseMessages.CREATED));
+    .status(StatusCodes.CREATED)
+    .json(
+      new ApiResponse(StatusCodes.CREATED, category, ResponseMessages.CREATED)
+    );
 });
 
 const listCategories = asyncHandler(async (req, res) => {
@@ -19,8 +22,10 @@ const listCategories = asyncHandler(async (req, res) => {
     .withId()
     .execute();
   return res
-    .status(200)
-    .json(new ApiResponse(200, categories, ResponseMessages.FETCHED));
+    .status(StatusCodes.OK)
+    .json(
+      new ApiResponse(StatusCodes.OK, categories, ResponseMessages.FETCHED)
+    );
 });
 
 const getCategoryById = asyncHandler(async (req, res) => {
@@ -33,8 +38,8 @@ const getCategoryById = asyncHandler(async (req, res) => {
     throw new ApiError(404, ValidationMessages.RecordNotFound);
   }
   return res
-    .status(200)
-    .json(new ApiResponse(200, category, ResponseMessages.FETCHED));
+    .status(StatusCodes.OK)
+    .json(new ApiResponse(StatusCodes.OK, category, ResponseMessages.FETCHED));
 });
 
 const updateCategory = asyncHandler(async (req, res) => {
@@ -46,8 +51,8 @@ const updateCategory = asyncHandler(async (req, res) => {
   }
 
   return res
-    .status(200)
-    .json(new ApiResponse(200, category, ResponseMessages.UPDATED));
+    .status(StatusCodes.OK)
+    .json(new ApiResponse(StatusCodes.OK, category, ResponseMessages.UPDATED));
 });
 
 const deleteCategory = asyncHandler(async (req, res) => {
@@ -59,10 +64,10 @@ const deleteCategory = asyncHandler(async (req, res) => {
   }
 
   return res
-    .status(200)
+    .status(StatusCodes.OK)
     .json(
       new ApiResponse(
-        200,
+        StatusCodes.OK,
         { deletedCategory: category },
         ResponseMessages.DELETED
       )

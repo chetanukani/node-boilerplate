@@ -8,6 +8,7 @@ import ProductService from "../../db/services/product.services.js";
 import { ApiError } from "../../utils/ApiError.js";
 import { ApiResponse } from "../../utils/ApiResponse.js";
 import { asyncHandler } from "../../utils/asyncHandler.js";
+import { StatusCodes } from "http-status-codes";
 import {
   handleFileUpload,
   handleMultipleFilesUpload,
@@ -60,9 +61,13 @@ const createProduct = asyncHandler(async (req, res) => {
   });
 
   return res
-    .status(201)
+    .status(StatusCodes.CREATED)
     .json(
-      new ApiResponse(201, product, ResponseMessages.ProductCreatedSuccess)
+      new ApiResponse(
+        StatusCodes.CREATED,
+        product,
+        ResponseMessages.ProductCreatedSuccess
+      )
     );
 });
 

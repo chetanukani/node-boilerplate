@@ -9,6 +9,7 @@ import {
 } from "../../constants.js";
 import { ApiError } from "../../utils/ApiError.js";
 import { ApiResponse } from "../../utils/ApiResponse.js";
+import { StatusCodes } from "http-status-codes";
 import { asyncHandler } from "../../utils/asyncHandler.js";
 import UserService from "../../db/services/user.services.js";
 import SessionService from "../../db/services/session.services.js";
@@ -24,7 +25,11 @@ const createTokensAndSession = async ({ userId, deviceId, ip, userAgent }) => {
       .withId()
       .withAuthTokens()
       .execute();
-    if (!user) throw new ApiError(400, ValidationMessages.RecordNotFound);
+    if (!user)
+      throw new ApiError(
+        StatusCodes.NOT_FOUND,
+        ValidationMessages.RecordNotFound
+      );
 
     const accessToken = user.generateAccessToken();
 
@@ -90,13 +95,17 @@ const registerUser = asyncHandler(async (req, res) => {
     .execute();
 
   if (!createdUser) {
-    throw new ApiError(500, "Something went wrong while registering the user");
+    throw new ApiError(500, ValidationMessages.SomethingWentWrong);
   }
 
   return res
-    .status(201)
+    .status(StatusCodes.CREATED)
     .json(
-      new ApiResponse(200, { user: createdUser }, ResponseMessages.CREATED)
+      new ApiResponse(
+        StatusCodes.CREATED,
+        { user: createdUser },
+        ResponseMessages.CREATED
+      )
     );
 });
 
@@ -104,7 +113,10 @@ const loginUser = asyncHandler(async (req, res) => {
   const { email, username, password } = req.body;
 
   if (!username && !email) {
-    throw new ApiError(400, ValidationMessages.SomethingWentWrong);
+    throw new ApiError(
+      StatusCodes.BAD_REQUEST,
+      ValidationMessages.SomethingWentWrong
+    );
   }
 
   const user = await UserService.findUserByUserNameOrEmail({
@@ -116,13 +128,19 @@ const loginUser = asyncHandler(async (req, res) => {
     .execute();
 
   if (!user) {
-    throw new ApiError(404, ValidationMessages.RecordNotFound);
+    throw new ApiError(
+      StatusCodes.NOT_FOUND,
+      ValidationMessages.RecordNotFound
+    );
   }
 
   const isPasswordValid = await user.isPasswordCorrect(password);
 
   if (!isPasswordValid) {
-    throw new ApiError(401, ValidationMessages.InvalidCredentials);
+    throw new ApiError(
+      StatusCodes.UNAUTHORIZED,
+      ValidationMessages.InvalidCredentials
+    );
   }
 
   const deviceId = req.body.deviceId || req.headers["x-device-id"];
@@ -149,12 +167,12 @@ const loginUser = asyncHandler(async (req, res) => {
   };
 
   return res
-    .status(200)
+    .status(StatusCodes.OK)
     .cookie("accessToken", accessToken, options) // set the access token in the cookie
     .cookie("refreshToken", refreshToken, options) // set the refresh token in the cookie
     .json(
       new ApiResponse(
-        200,
+        StatusCodes.OK,
         { user: loggedInUser, accessToken, refreshToken }, // send access and refresh token in response if client decides to save them by themselves
         ResponseMessages.LoginSuccess
       )
@@ -165,13 +183,20 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
   const token =
     req.cookies?.refreshToken ||
     req.header("Authorization")?.replace("Bearer ", "");
-  if (!token) throw new ApiError(401, ValidationMessages.UnAuthorized);
+  if (!token)
+    throw new ApiError(
+      StatusCodes.UNAUTHORIZED,
+      ValidationMessages.UnAuthorized
+    );
 
   let decoded;
   try {
     decoded = jwt.verify(token, process.env.REFRESH_TOKEN_SECRET);
   } catch (err) {
-    throw new ApiError(401, ValidationMessages.UnAuthorized);
+    throw new ApiError(
+      StatusCodes.UNAUTHORIZED,
+      ValidationMessages.UnAuthorized
+    );
   }
 
   const { _id: userId, jti } = decoded;
@@ -179,14 +204,20 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
   if (!session || session.revoked || String(session.user) !== String(userId)) {
     // possible reuse or invalid token
     await SessionService.revokeAllForUser(userId);
-    throw new ApiError(401, ValidationMessages.UnAuthorized);
+    throw new ApiError(
+      StatusCodes.UNAUTHORIZED,
+      ValidationMessages.UnAuthorized
+    );
   }
 
   const currentHash = hashToken(token);
   if (currentHash !== session.tokenHash) {
     // token reuse detected
     await SessionService.revokeAllForUser(userId);
-    throw new ApiError(401, ValidationMessages.UnAuthorized);
+    throw new ApiError(
+      StatusCodes.UNAUTHORIZED,
+      ValidationMessages.UnAuthorized
+    );
   }
 
   // rotate: issue new refresh token and access token, update session
@@ -195,7 +226,11 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
   const userAgent = session.userAgent;
 
   const user = await UserService.findUserById(userId).withId().execute();
-  if (!user) throw new ApiError(401, ValidationMessages.UnAuthorized);
+  if (!user)
+    throw new ApiError(
+      StatusCodes.UNAUTHORIZED,
+      ValidationMessages.UnAuthorized
+    );
 
   const newJti = crypto.randomUUID
     ? crypto.randomUUID()
@@ -224,12 +259,12 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
   };
 
   return res
-    .status(200)
+    .status(StatusCodes.OK)
     .cookie("accessToken", accessToken, options)
     .cookie("refreshToken", newRefreshToken, options)
     .json(
       new ApiResponse(
-        200,
+        StatusCodes.OK,
         { accessToken, refreshToken: newRefreshToken },
         "Tokens refreshed"
       )
@@ -248,8 +283,14 @@ const forgotPassword = asyncHandler(async (req, res) => {
   // Always respond with success to avoid user enumeration
   if (!user) {
     return res
-      .status(200)
-      .json(new ApiResponse(200, {}, ResponseMessages.PasswordResetEmailSent));
+      .status(StatusCodes.OK)
+      .json(
+        new ApiResponse(
+          StatusCodes.OK,
+          {},
+          ResponseMessages.PasswordResetEmailSent
+        )
+      );
   }
 
   // generate temporary token using model helper
@@ -278,8 +319,14 @@ const forgotPassword = asyncHandler(async (req, res) => {
   });
 
   return res
-    .status(200)
-    .json(new ApiResponse(200, {}, ResponseMessages.PasswordResetEmailSent));
+    .status(StatusCodes.OK)
+    .json(
+      new ApiResponse(
+        StatusCodes.OK,
+        {},
+        ResponseMessages.PasswordResetEmailSent
+      )
+    );
 });
 
 const resetPassword = asyncHandler(async (req, res) => {
@@ -306,8 +353,10 @@ const resetPassword = asyncHandler(async (req, res) => {
   await SessionService.revokeAllForUser(user._id);
 
   return res
-    .status(200)
-    .json(new ApiResponse(200, {}, ResponseMessages.PasswordResetSuccess));
+    .status(StatusCodes.OK)
+    .json(
+      new ApiResponse(StatusCodes.OK, {}, ResponseMessages.PasswordResetSuccess)
+    );
 });
 
 const logoutUser = asyncHandler(async (req, res) => {
@@ -331,10 +380,10 @@ const logoutUser = asyncHandler(async (req, res) => {
   };
 
   return res
-    .status(200)
+    .status(StatusCodes.OK)
     .clearCookie("accessToken", options)
     .clearCookie("refreshToken", options)
-    .json(new ApiResponse(200, {}, "User logged out"));
+    .json(new ApiResponse(StatusCodes.OK, {}, "User logged out"));
 });
 
 const logoutAllSessions = asyncHandler(async (req, res) => {
@@ -348,10 +397,10 @@ const logoutAllSessions = asyncHandler(async (req, res) => {
     secure: process.env.NODE_ENV === "production",
   };
   return res
-    .status(200)
+    .status(StatusCodes.OK)
     .clearCookie("accessToken", options)
     .clearCookie("refreshToken", options)
-    .json(new ApiResponse(200, {}, "All sessions revoked"));
+    .json(new ApiResponse(StatusCodes.OK, {}, "All sessions revoked"));
 });
 
 const listSessions = asyncHandler(async (req, res) => {
@@ -360,8 +409,8 @@ const listSessions = asyncHandler(async (req, res) => {
 
   const sessions = await SessionService.listSessionsForUser(userId);
   return res
-    .status(200)
-    .json(new ApiResponse(200, sessions, "Active sessions fetched"));
+    .status(StatusCodes.OK)
+    .json(new ApiResponse(StatusCodes.OK, sessions, "Active sessions fetched"));
 });
 
 const getProfile = asyncHandler(async (req, res) => {
@@ -370,8 +419,14 @@ const getProfile = asyncHandler(async (req, res) => {
     .withBasicInfo()
     .execute();
   return res
-    .status(200)
-    .json(new ApiResponse(200, userData, ResponseMessages.ProfileFetchSuccess));
+    .status(StatusCodes.OK)
+    .json(
+      new ApiResponse(
+        StatusCodes.OK,
+        userData,
+        ResponseMessages.ProfileFetchSuccess
+      )
+    );
 });
 
 /**
@@ -385,12 +440,14 @@ const simulateNotification = asyncHandler(async (req, res) => {
   await NotificationService.sendNotificationToUserById(userId);
 
   return res
-    .status(200)
-    .json(new ApiResponse(200, {}, "Notification simulated"));
+    .status(StatusCodes.OK)
+    .json(new ApiResponse(StatusCodes.OK, {}, "Notification simulated"));
 });
 
 const testingAppSetting = asyncHandler(async (req, res, next) => {
-  return res.status(200).json(new ApiResponse(200, {}, "App setting tested"));
+  return res
+    .status(StatusCodes.OK)
+    .json(new ApiResponse(StatusCodes.OK, {}, "App setting tested"));
 });
 
 export {

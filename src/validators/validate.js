@@ -1,6 +1,8 @@
 import { validationResult } from "express-validator";
 import { errorHandler } from "../middlewares/error.middlewares.js";
 import { ApiError } from "../utils/ApiError.js";
+import { StatusCodes } from "http-status-codes";
+import { ValidationMessages } from "../constants.js";
 /**
  *
  * @param {import("express").Request} req
@@ -13,13 +15,17 @@ import { ApiError } from "../utils/ApiError.js";
  *
  */
 export const validate = (req, res, next) => {
-    const errors = validationResult(req);
-    if (errors.isEmpty()) {
-        return next();
-    }
-    const extractedErrors = [];
-    errors.array().map((err) => extractedErrors.push({ [err.path]: err.msg }));
+  const errors = validationResult(req);
+  if (errors.isEmpty()) {
+    return next();
+  }
+  const extractedErrors = [];
+  errors.array().map((err) => extractedErrors.push({ [err.path]: err.msg }));
 
-    // 422: Unprocessable Entity
-    throw new ApiError(422, "Received data is not valid", extractedErrors);
+  // 400: Bad Request - validation failed
+  throw new ApiError(
+    StatusCodes.BAD_REQUEST,
+    ValidationMessages.InvalidData,
+    extractedErrors
+  );
 };
