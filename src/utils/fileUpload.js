@@ -1,7 +1,6 @@
 import fs from "fs";
 import path from "path";
 import S3Service from "./s3.js";
-import logger from "../logger/winston.logger.js";
 
 /**
  * @description Handles file upload to either S3 or local storage
@@ -73,9 +72,9 @@ export const deleteFile = async (localPath) => {
     try {
       const fullPath = `public/images/${localPath}`;
       fs.unlinkSync(fullPath);
-      logger.info(`Local file deleted: ${fullPath}`);
+      console.log(`Local file deleted: ${fullPath}`);
     } catch (error) {
-      logger.error("Error deleting local file:", error);
+      console.error("Error deleting local file:", error);
     }
   }
 };

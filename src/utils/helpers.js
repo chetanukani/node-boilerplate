@@ -1,7 +1,6 @@
 import fs from "fs";
 import mongoose from "mongoose";
 import S3Service from "../utils/s3.js";
-import logger from "../logger/winston.logger.js";
 
 /**
  *
@@ -117,9 +116,9 @@ export const removeLocalFile = (localPath) => {
   if (!localPath) return;
 
   fs.unlink(localPath, (err) => {
-    if (err) logger.error("Error while removing local files: ", err);
+    if (err) console.error("Error while removing local files: ", err);
     else {
-      logger.info("Removed local: ", localPath);
+      console.log("Removed local: ", localPath);
     }
   });
 };
@@ -134,11 +133,11 @@ export const removeUnusedS3FileUploadsOnError = (req) => {
     s3Keys.forEach((key) => {
       if (!key) return;
       S3Service.deleteFile(key).catch((error) => {
-        logger.error("Error while removing S3 file after error:", error);
+        console.error("Error while removing S3 file after error:", error);
       });
     });
   } catch (error) {
-    logger.error("Error while removing S3 uploaded files on error:", error);
+    console.error("Error while removing S3 uploaded files on error:", error);
   }
 };
 
@@ -178,7 +177,7 @@ export const removeUnusedMulterImageFilesOnError = (req) => {
     }
   } catch (error) {
     // fail silently
-    logger.error("Error while removing image files: ", error);
+    console.error("Error while removing image files: ", error);
   }
 };
 

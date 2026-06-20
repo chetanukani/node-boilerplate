@@ -3,7 +3,6 @@ import {
   PutObjectCommand,
   DeleteObjectCommand,
 } from "@aws-sdk/client-s3";
-import logger from "../logger/winston.logger.js";
 
 class S3Service {
   constructor() {
@@ -31,13 +30,13 @@ class S3Service {
 
     if (this.useS3) {
       if (!this.bucketName) {
-        logger.warn("USE_S3 is enabled but AWS_S3_BUCKET_NAME is not set.");
+        console.warn("USE_S3 is enabled but AWS_S3_BUCKET_NAME is not set.");
       }
       if (
         !process.env.AWS_ACCESS_KEY_ID ||
         !process.env.AWS_SECRET_ACCESS_KEY
       ) {
-        logger.warn(
+        console.warn(
           "AWS credentials are not fully set in environment variables."
         );
       }
@@ -71,10 +70,10 @@ class S3Service {
       });
 
       await this.s3Client.send(command);
-      logger.info(`File uploaded to S3: ${key}`);
+      console.log(`File uploaded to S3: ${key}`);
       return key; // Return only the relative path
     } catch (error) {
-      logger.error("S3 upload error:", error);
+      console.error("S3 upload error:", error);
       throw new Error(`Failed to upload file to S3: ${error.message}`);
     }
   }
@@ -92,9 +91,9 @@ class S3Service {
       });
 
       await this.s3Client.send(command);
-      logger.info(`File deleted from S3: ${key}`);
+      console.log(`File deleted from S3: ${key}`);
     } catch (error) {
-      logger.error("S3 delete error:", error);
+      console.error("S3 delete error:", error);
       throw new Error(`Failed to delete file from S3: ${error.message}`);
     }
   }

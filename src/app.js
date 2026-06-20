@@ -3,7 +3,6 @@ import cors from "cors";
 import express from "express";
 import { rateLimit } from "express-rate-limit";
 import { createServer } from "http";
-import requestIp from "request-ip";
 import { Server } from "socket.io";
 import morganMiddleware from "./logger/morgan.logger.js";
 import { ApiError } from "./utils/ApiError.js";
@@ -37,8 +36,6 @@ app.use(
     credentials: true,
   })
 );
-
-app.use(requestIp.mw());
 
 // Rate limiter to avoid misuse of the service and avoid cost spikes
 const limiter = rateLimit({

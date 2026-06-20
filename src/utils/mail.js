@@ -1,6 +1,5 @@
 import Mailgen from "mailgen";
 import nodemailer from "nodemailer";
-import logger from "../logger/winston.logger.js";
 
 /**
  *
@@ -50,10 +49,10 @@ const sendEmail = async (options) => {
   } catch (error) {
     // As sending email is not strongly coupled to the business logic it is not worth to raise an error when email sending fails
     // So it's better to fail silently rather than breaking the app
-    logger.error(
+    console.error(
       "Email service failed silently. Make sure you have provided your credentials in the .env file"
     );
-    logger.error("Error: ", error);
+    console.error("Error: ", error);
   }
 };
 

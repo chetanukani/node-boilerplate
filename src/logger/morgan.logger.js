@@ -1,19 +1,15 @@
 import morgan from "morgan";
-import logger from "./winston.logger.js";
 
-const stream = {
-    // Use the http severity
-    write: (message) => logger.http(message.trim()),
-};
+// Disable HTTP logs only when explicitly requested
+const skip = () => process.env.DISABLE_HTTP_LOGS === "true";
 
-const skip = () => {
-    const env = process.env.NODE_ENV || "development";
-    return env !== "development";
-};
-
+// Use morgan to write to stdout (console). No file transports.
 const morganMiddleware = morgan(
-    ":remote-addr :method :url :status - :response-time ms",
-    { stream, skip }
+  ":remote-addr :method :url :status - :response-time ms",
+  {
+    skip,
+    stream: process.stdout,
+  }
 );
 
 export default morganMiddleware;

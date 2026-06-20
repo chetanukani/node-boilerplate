@@ -1,21 +1,20 @@
 import mongoose from "mongoose";
-import logger from "../logger/winston.logger.js";
 
 const registerConnectionEvents = () => {
   mongoose.connection.on("connected", () => {
-    logger.info(`MongoDB connected! Db host: ${mongoose.connection.host}`);
+    console.log(`MongoDB connected! Db host: ${mongoose.connection.host}`);
   });
 
   mongoose.connection.on("disconnected", () => {
-    logger.info("MongoDB connection disconnected");
+    console.log("MongoDB connection disconnected");
   });
 
   mongoose.connection.on("reconnected", () => {
-    logger.info("MongoDB connection re-established");
+    console.log("MongoDB connection re-established");
   });
 
   mongoose.connection.on("error", (error) => {
-    logger.error("MongoDB runtime connection error: ", error);
+    console.error("MongoDB runtime connection error: ", error);
   });
 };
 
@@ -24,7 +23,7 @@ const connectDB = async () => {
     registerConnectionEvents();
     await mongoose.connect(process.env.MONGODB_URI);
   } catch (error) {
-    logger.error("MongoDB connection error: ", error);
+    console.error("MongoDB connection error: ", error);
     process.exit(1);
   }
 };

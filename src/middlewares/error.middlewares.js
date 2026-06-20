@@ -1,6 +1,4 @@
 import mongoose from "mongoose";
-
-import logger from "../logger/winston.logger.js";
 import { ApiError } from "../utils/ApiError.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import {
@@ -43,7 +41,7 @@ const errorHandler = (err, req, res, next) => {
     ...(process.env.NODE_ENV === "development" ? { stack: error.stack } : {}), // Error stack traces should be visible in development for debugging
   };
 
-  logger.error(`${error.message}`);
+  console.error(`${error.message}`);
 
   removeUnusedMulterImageFilesOnError(req);
   removeUnusedS3FileUploadsOnError(req);
