@@ -13,13 +13,6 @@ const productSchema = new Schema(
       required: true,
       type: String,
     },
-    [TableFields.mainImage]: {
-      required: true,
-      type: {
-        url: String,
-        localPath: String,
-      },
-    },
     [TableFields.name_]: {
       required: true,
       type: String,
@@ -32,15 +25,12 @@ const productSchema = new Schema(
       default: 0,
       type: Number,
     },
-    [TableFields.subImages]: {
-      type: [
-        {
-          url: String,
-          localPath: String,
-        },
-      ],
-      default: [],
-    },
+    [TableFields.media]: [
+      {
+        [TableFields.url]: String,
+        [TableFields.mediaType]: Number,
+      },
+    ],
   },
   {
     timestamps: true,
@@ -53,26 +43,21 @@ const productSchema = new Schema(
 );
 
 /**
- * @description Attaches S3 URLs to document fields
+ * @description Attaches URLs to document fields
  */
 function attachS3Links(ret) {
-  const buildUrl = (localPath) => {
-    if (!localPath) return null;
-    if (S3Service.isEnabled()) return S3Service.getUrl(localPath);
-    return `${process.env.HOST_URL}/images/${localPath}`;
+  const buildUrl = (url) => {
+    if (!url) return null;
+    if (S3Service.isEnabled()) return S3Service.getUrl(url);
+    return `${process.env.HOST_URL}/images/${url}`;
   };
 
-  if (ret[TableFields.mainImage]?.localPath) {
-    ret[TableFields.mainImage].url = buildUrl(
-      ret[TableFields.mainImage].localPath
-    );
-  }
-
-  if (ret[TableFields.subImages] && Array.isArray(ret[TableFields.subImages])) {
-    ret[TableFields.subImages] = ret[TableFields.subImages].map((image) => ({
-      ...image,
-      url: buildUrl(image.localPath),
-    }));
+  if (ret[TableFields.media] && Array.isArray(ret[TableFields.media])) {
+    ret[TableFields.media].forEach((ele) => {
+      if (ele[TableFields.url]) {
+        ele[TableFields.url] = buildUrl(ele[TableFields.url]);
+      }
+    });
   }
 }
 

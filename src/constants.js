@@ -140,6 +140,7 @@ export const TableFields = {
   category: "category",
   description: "description",
   mainImage: "mainImage",
+  media: "media",
   price: "price",
   stock: "stock",
   subImages: "subImages",
@@ -151,6 +152,8 @@ export const TableFields = {
   fcmTokens: "fcmTokens",
   token: "token",
   platform: "platform",
+  image: "image",
+  mediaType: "mediaType",
 };
 
 /** Shared validation / error messages */
@@ -184,4 +187,13 @@ export const ResponseMessages = {
 export const PlatformType = {
   Android: "android",
   iOS: "ios",
+};
+
+export const MediaTypes = {
+  Image: 1,
+  Audio: 2,
+  Video: 3,
+  Pdf: 4,
+  Excel: 5,
+  Doc: 6,
 };

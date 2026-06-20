@@ -27,8 +27,7 @@ export const handleFileUpload = async (file, folder, req = null) => {
     }
 
     return {
-      url: S3Service.getUrl(relativePath),
-      localPath: relativePath, // Store relative path in DB
+      url: relativePath,
     };
   } else {
     // Store locally
@@ -36,8 +35,7 @@ export const handleFileUpload = async (file, folder, req = null) => {
     const localPath = `${folder}/${fileName}`;
 
     return {
-      url: `${process.env.HOST_URL}/images/${localPath}`,
-      localPath: localPath,
+      url: localPath,
     };
   }
 };

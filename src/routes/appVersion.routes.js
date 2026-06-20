@@ -3,7 +3,7 @@ import { appVersionRequestBodyValidator } from "../validators/appVersion.validat
 import {
   updateOrAddAppSettings,
   getAllAppVersion,
-} from "../controllers/appVersion.controllers.js";
+} from "../controllers/admin/appVersion.controllers.js";
 import { validate } from "../validators/validate.js";
 
 const router = express.Router();

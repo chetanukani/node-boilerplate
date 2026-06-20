@@ -1,4 +1,5 @@
 import crypto from "crypto";
+import Util from "../../utils/util.js";
 import jwt from "jsonwebtoken";
 import {
   ResponseMessages,
@@ -16,8 +17,8 @@ import SessionService from "../../db/services/session.services.js";
 import NotificationService from "../../db/services/notification/notification.services.js";
 import { sendEmail, forgotPasswordMailgenContent } from "../../utils/mail.js";
 
-const hashToken = (token) =>
-  crypto.createHash("sha256").update(token).digest("hex");
+// prefer shared util functions
+const hashToken = (token) => Util.hashToken(token);
 
 const createTokensAndSession = async ({ userId, deviceId, ip, userAgent }) => {
   try {
@@ -34,9 +35,7 @@ const createTokensAndSession = async ({ userId, deviceId, ip, userAgent }) => {
     const accessToken = user.generateAccessToken();
 
     // create refresh token with jti
-    const jti = crypto.randomUUID
-      ? crypto.randomUUID()
-      : crypto.randomBytes(16).toString("hex");
+    const jti = Util.generateJti();
     const refreshToken = jwt.sign(
       { _id: userId, jti },
       process.env.REFRESH_TOKEN_SECRET,
@@ -232,9 +231,7 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
       ValidationMessages.UnAuthorized
     );
 
-  const newJti = crypto.randomUUID
-    ? crypto.randomUUID()
-    : crypto.randomBytes(16).toString("hex");
+  const newJti = Util.generateJti();
   const newRefreshToken = jwt.sign(
     { _id: userId, jti: newJti },
     process.env.REFRESH_TOKEN_SECRET,

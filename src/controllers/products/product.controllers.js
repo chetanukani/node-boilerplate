@@ -22,42 +22,36 @@ const createProduct = asyncHandler(async (req, res) => {
     .execute();
 
   if (!categoryToBeAdded) {
-    throw new ApiError(404, ValidationMessages.RecordNotFound);
+    throw new ApiError(
+      StatusCodes.NOT_FOUND,
+      ValidationMessages.RecordNotFound
+    );
   }
 
   req.uploadedFileKeys = [];
 
   // Check if user has uploaded a main image
-  if (!req.files?.mainImage || !req.files?.mainImage.length) {
-    throw new ApiError(400, ValidationMessages.ImageRequired);
+  if (!req.files?.media || !req.files?.media.length) {
+    throw new ApiError(
+      StatusCodes.BAD_REQUEST,
+      ValidationMessages.ImageRequired
+    );
   }
 
-  // Upload main image
-  const mainImageData = await handleFileUpload(
-    req.files.mainImage[0],
-    "products",
+  // Upload image
+  const mediaFiles = await handleMultipleFilesUpload(
+    req.files.media,
+    "productsDemo",
     req
   );
-
-  // Upload sub images
-  const subImagesData = req.files.subImages
-    ? await handleMultipleFilesUpload(req.files.subImages, "products", req)
-    : [];
 
   const product = await ProductService.addProduct({
     name,
     description,
     stock,
     price,
-    mainImage: {
-      url: mainImageData.url,
-      localPath: mainImageData.localPath,
-    },
-    subImages: subImagesData.map((img) => ({
-      url: img.url,
-      localPath: img.localPath,
-    })),
     category,
+    media: mediaFiles,
   });
 
   return res

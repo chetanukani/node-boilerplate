@@ -35,7 +35,5 @@ build/Release
 NOTES.md
 
 # Uploaded files (keep the folders, ignore their contents)
-/public/images/*
-/public/temp/*
-!/public/images/.gitkeep
-!/public/temp/.gitkeep
+/public/files/*
+!/public/files/.gitkeep

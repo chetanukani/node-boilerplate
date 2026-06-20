@@ -1,6 +1,6 @@
-import { ResponseMessages } from "../constants.js";
-import AppVersionService from "../db/services/appVersion.services.js";
-import { ApiResponse } from "../utils/ApiResponse.js";
+import { ResponseMessages } from "../../constants.js";
+import AppVersionService from "../../db/services/appVersion.services.js";
+import { ApiResponse } from "../../utils/ApiResponse.js";
 import { StatusCodes } from "http-status-codes";
 
 async function updateOrAddAppSettings(req, res, next) {

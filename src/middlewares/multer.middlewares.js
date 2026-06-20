@@ -4,7 +4,7 @@ import fs from "fs";
 import S3Service from "../utils/s3.js";
 
 // Base upload directory inside the public folder
-const uploadDir = path.join(process.cwd(), "public", "images");
+const uploadDir = path.join(process.cwd(), "public", "files");
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
