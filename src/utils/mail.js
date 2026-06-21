@@ -1,5 +1,6 @@
 import Mailgen from "mailgen";
 import nodemailer from "nodemailer";
+import { env } from "../config/index.js";
 
 /**
  *
@@ -25,15 +26,15 @@ const sendEmail = async (options) => {
   // Create a nodemailer transporter instance which is responsible to send a mail
   const transporter = nodemailer.createTransport(
     {
-      host: process.env.SMTP_HOST,
-      port: process.env.SMTP_PORT,
+      host: env.SMTP_HOST,
+      port: env.SMTP_PORT,
       auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS,
+        user: env.SMTP_USER,
+        pass: env.SMTP_PASS,
       },
     },
     {
-      from: `${process.env.SMTP_SENDER_NAME}`,
+      from: env.SMTP_SENDER_NAME,
     }
   );
 

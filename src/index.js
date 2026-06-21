@@ -1,26 +1,19 @@
-import dotenv from "dotenv";
+import "./config/index.js";
 import { httpServer } from "./app.js";
 import connectDB, { disconnectDB } from "./db/index.js";
-
-dotenv.config({ path: "./.env" });
+import { env } from "./config/index.js";
 
 const startServer = () => {
-  httpServer.listen(process.env.PORT || 8080, () => {
-    console.log("⚙️  Server is running on port: " + process.env.PORT);
+  httpServer.listen(env.PORT, () => {
+    console.log(`⚙️  Server is running on port: ${env.PORT}`);
   });
 
-  // Prevent a crash on listen errors such as the port being already in use
   httpServer.on("error", (err) => {
     console.error("HTTP server error: ", err);
     process.exit(1);
   });
 };
 
-/**
- * Gracefully shut down: stop accepting new connections, then exit.
- * Acts as a last-resort safety net so the process does not stay in a
- * corrupted state after a fatal error.
- */
 const gracefulShutdown = (signalOrError, exitCode = 0) => {
   console.log(`Shutting down server (${signalOrError})...`);
   httpServer.close(async () => {
@@ -33,14 +26,12 @@ const gracefulShutdown = (signalOrError, exitCode = 0) => {
     process.exit(exitCode);
   });
 
-  // Force-exit if connections do not close within 10 seconds
   setTimeout(() => {
     console.error("Could not close connections in time, forcing shutdown.");
     process.exit(exitCode);
   }, 10000).unref();
 };
 
-// Last-resort process-level safety nets to avoid silent crashes
 process.on("uncaughtException", (err) => {
   console.error("Uncaught Exception: ", err);
   gracefulShutdown("uncaughtException", 1);
@@ -60,4 +51,5 @@ try {
   startServer();
 } catch (err) {
   console.error("Mongo db connect error: ", err);
+  process.exit(1);
 }

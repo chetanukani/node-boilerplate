@@ -172,6 +172,7 @@ export const ValidationMessages = {
   BulkProductLimitExceeded: "Bulk product limit exceeded",
   ProductMediaRequired: "Media is required for each product",
   InvalidAurTokenExpired: "Invalid or expired password reset token",
+  PasswordRequired: "Password is required",
   DevOnlyService: "This service is only available in the local environment",
 };
 

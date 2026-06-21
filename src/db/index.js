@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { env } from "../config/index.js";
 
 const registerConnectionEvents = () => {
   mongoose.connection.on("connected", () => {
@@ -21,7 +22,7 @@ const registerConnectionEvents = () => {
 const connectDB = async () => {
   try {
     registerConnectionEvents();
-    await mongoose.connect(process.env.MONGODB_URI);
+    await mongoose.connect(env.MONGODB_URI);
   } catch (error) {
     console.error("MongoDB connection error: ", error);
     process.exit(1);

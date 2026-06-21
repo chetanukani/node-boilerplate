@@ -6,6 +6,7 @@
   "scripts": {
     "start": "node -r dotenv/config src/index.js",
     "dev": "nodemon -r dotenv/config src/index.js",
+    "lint": "eslint .",
     "format": "prettier --write \"**/*.{js,json,md}\"",
     "format:check": "prettier --check \"**/*.{js,json,md}\"",
     "lint:staged": "lint-staged",
@@ -21,7 +22,6 @@
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1068.0",
     "@aws-sdk/s3-request-presigner": "^3.1068.0",
-    "@faker-js/faker": "^10.4.0",
     "bcrypt": "^6.0.0",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.6",
@@ -30,6 +30,7 @@
     "express-compression": "^1.0.2",
     "express-rate-limit": "^8.5.2",
     "firebase-admin": "^14.0.0",
+    "helmet": "^8.2.0",
     "http-status-codes": "^2.3.0",
     "jsonwebtoken": "^9.0.3",
     "mailgen": "^2.0.34",
@@ -46,7 +47,10 @@
   "devDependencies": {
     "@commitlint/cli": "^21.0.2",
     "@commitlint/config-conventional": "^21.0.2",
+    "@eslint/js": "^9.39.1",
     "@types/node": "^25.9.3",
+    "eslint": "^9.39.1",
+    "globals": "^16.5.0",
     "husky": "^8.0.3",
     "lint-staged": "^13.2.2",
     "nodemon": "^3.1.14",

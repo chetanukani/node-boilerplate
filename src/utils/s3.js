@@ -3,39 +3,35 @@ import {
   PutObjectCommand,
   DeleteObjectCommand,
 } from "@aws-sdk/client-s3";
+import { env } from "../config/index.js";
 
 class S3Service {
   constructor() {
     const s3Config = {
-      region: process.env.AWS_REGION,
+      region: env.AWS_REGION,
       credentials: {
-        accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+        accessKeyId: env.AWS_ACCESS_KEY_ID,
+        secretAccessKey: env.AWS_SECRET_ACCESS_KEY,
       },
     };
 
-    // Optional: custom endpoint for S3-compatible services (e.g., MinIO)
-    if (process.env.AWS_S3_ENDPOINT) {
-      s3Config.endpoint = process.env.AWS_S3_ENDPOINT;
+    if (env.AWS_S3_ENDPOINT) {
+      s3Config.endpoint = env.AWS_S3_ENDPOINT;
     }
 
-    // Optional: force path style for dot-containing bucket names or S3-compatible endpoints
-    if (process.env.AWS_S3_FORCE_PATH_STYLE === "true") {
+    if (env.AWS_S3_FORCE_PATH_STYLE) {
       s3Config.forcePathStyle = true;
     }
 
     this.s3Client = new S3Client(s3Config);
-    this.bucketName = process.env.AWS_S3_BUCKET_NAME;
-    this.useS3 = process.env.USE_S3 === "true";
+    this.bucketName = env.AWS_S3_BUCKET_NAME;
+    this.useS3 = env.USE_S3;
 
     if (this.useS3) {
       if (!this.bucketName) {
         console.warn("USE_S3 is enabled but AWS_S3_BUCKET_NAME is not set.");
       }
-      if (
-        !process.env.AWS_ACCESS_KEY_ID ||
-        !process.env.AWS_SECRET_ACCESS_KEY
-      ) {
+      if (!env.AWS_ACCESS_KEY_ID || !env.AWS_SECRET_ACCESS_KEY) {
         console.warn(
           "AWS credentials are not fully set in environment variables."
         );
@@ -50,7 +46,7 @@ class S3Service {
    */
   getUrl(key) {
     if (!key) return null;
-    return `https://${this.bucketName}.s3.${process.env.AWS_REGION}.amazonaws.com/${key}`;
+    return `https://${this.bucketName}.s3.${env.AWS_REGION}.amazonaws.com/${key}`;
   }
 
   /**

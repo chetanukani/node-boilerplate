@@ -49,7 +49,7 @@ const userSchema = new Schema(
     },
     [TableFields.password]: {
       type: String,
-      required: [true, ValidationMessages.P],
+      required: [true, ValidationMessages.PasswordRequired],
     },
     [TableFields.loginType]: {
       type: String,
@@ -156,38 +156,33 @@ userSchema.methods.generateTemporaryToken = function () {
  * @param {{token: string, deviceId?: string, platform?: string}} tokenObj
  */
 userSchema.methods.addDeviceToken = async function (tokenObj) {
-  if (!tokenObj || !tokenObj.token) return this;
-  const existingIndex = this.deviceTokens.findIndex(
-    (t) =>
-      t.token === tokenObj.token ||
-      (tokenObj.deviceId && t.deviceId === tokenObj.deviceId)
+  if (!tokenObj?.token) return this;
+
+  const tokens = this[TableFields.fcmTokens] || [];
+  const existingIndex = tokens.findIndex(
+    (entry) => entry.token === tokenObj.token
   );
-  const now = new Date();
+  const nextEntry = {
+    [TableFields.token]: tokenObj.token,
+    [TableFields.platform]: tokenObj.platform || PlatformType.Android,
+  };
+
   if (existingIndex > -1) {
-    this.deviceTokens[existingIndex] = {
-      token: tokenObj.token,
-      deviceId: tokenObj.deviceId || this.deviceTokens[existingIndex].deviceId,
-      platform: tokenObj.platform || this.deviceTokens[existingIndex].platform,
-      lastSeen: now,
-    };
+    tokens[existingIndex] = nextEntry;
   } else {
-    this.deviceTokens.push({
-      token: tokenObj.token,
-      deviceId: tokenObj.deviceId || null,
-      platform: tokenObj.platform || null,
-      lastSeen: now,
-    });
+    tokens.push(nextEntry);
   }
+
+  this[TableFields.fcmTokens] = tokens;
   return this.save();
 };
 
-/**
- * Remove device token by token string
- * @param {string} token
- */
 userSchema.methods.removeDeviceToken = async function (token) {
   if (!token) return this;
-  this.deviceTokens = this.deviceTokens.filter((t) => t.token !== token);
+
+  this[TableFields.fcmTokens] = (this[TableFields.fcmTokens] || []).filter(
+    (entry) => entry.token !== token
+  );
   return this.save();
 };
 

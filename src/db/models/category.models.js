@@ -1,5 +1,6 @@
 import mongoose, { Schema } from "mongoose";
 import { TableFields, TableNames } from "../../constants.js";
+import { env } from "../../config/index.js";
 import S3Service from "../../utils/s3.js";
 
 const categorySchema = new Schema(
@@ -31,7 +32,7 @@ function attachS3Links(ret) {
   const buildUrl = (localPath) => {
     if (!localPath) return null;
     if (S3Service.isEnabled()) return S3Service.getUrl(localPath);
-    return `${process.env.HOST_URL}/images/${localPath}`;
+    return `${env.HOST_URL}/files/${localPath}`;
   };
 
   if (ret[TableFields.image]?.localPath) {

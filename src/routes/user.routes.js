@@ -17,6 +17,8 @@ import { validateRequest } from "../middlewares/zodValidate.middleware.js";
 import {
   userLoginValidator,
   userRegisterValidator,
+  forgotPasswordValidator,
+  resetPasswordValidator,
 } from "../validators/user.validator.js";
 
 const router = Router();
@@ -31,8 +33,12 @@ router.route("/profile").get(verifyJWT, getProfile);
 router.route("/refresh-token").post(refreshAccessToken);
 router.route("/sessions").get(verifyJWT, listSessions);
 router.route("/logout-all").post(verifyJWT, logoutAllSessions);
-router.route("/forgot-password").post(forgotPassword);
-router.route("/reset-password").post(resetPassword);
+router
+  .route("/forgot-password")
+  .post(validateRequest(forgotPasswordValidator), forgotPassword);
+router
+  .route("/reset-password")
+  .post(validateRequest(resetPasswordValidator), resetPassword);
 
 router.route("/simulate").post(verifyJWT, simulateNotification);
 router.route("/testing-app-setting").get(testingAppSetting);

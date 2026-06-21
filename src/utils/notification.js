@@ -74,7 +74,6 @@ export async function sendNotificationToTokens(
 
   for (const chunk of chunks) {
     try {
-      const obj = createObj(message, type, title, messageObj);
       const resp = await messaging.sendEachForMulticast(
         createObj(tokens, message, type, title, messageObj)
       );

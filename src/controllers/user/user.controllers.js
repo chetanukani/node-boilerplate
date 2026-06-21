@@ -16,6 +16,7 @@ import UserService from "../../db/services/user.services.js";
 import SessionService from "../../db/services/session.services.js";
 import NotificationService from "../../db/services/notification/notification.services.js";
 import { sendEmail, forgotPasswordMailgenContent } from "../../utils/mail.js";
+import { env } from "../../config/index.js";
 
 // prefer shared util functions
 const hashToken = (token) => Util.hashToken(token);
@@ -269,8 +270,7 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
 });
 
 const forgotPassword = asyncHandler(async (req, res) => {
-  const { email } = req.body;
-  if (!email) throw new ApiError(400, ValidationMessages.SomethingWentWrong);
+  const { email } = req.validated.body;
 
   const user = await UserService.findUserByUserNameOrEmail({ email })
     .withId()
@@ -301,8 +301,7 @@ const forgotPassword = asyncHandler(async (req, res) => {
     },
   });
 
-  const resetUrlBase =
-    process.env.FRONTEND_URL || `${req.protocol}://${req.get("host")}`;
+  const resetUrlBase = env.FRONTEND_URL || env.HOST_URL;
   const passwordResetUrl = `${resetUrlBase}/reset-password?token=${unHashedToken}`;
 
   // send email (failure to send email shouldn't block response)
@@ -327,9 +326,7 @@ const forgotPassword = asyncHandler(async (req, res) => {
 });
 
 const resetPassword = asyncHandler(async (req, res) => {
-  const { token, password } = req.body;
-  if (!token || !password)
-    throw new ApiError(400, ValidationMessages.SomethingWentWrong);
+  const { token, password } = req.validated.body;
 
   const tokenHash = crypto.createHash("sha256").update(token).digest("hex");
   const user = await UserService.findByForgotToken(tokenHash)

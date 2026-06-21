@@ -38,3 +38,19 @@ export const userLoginValidator = z.object({
       }
     }),
 });
+
+export const forgotPasswordValidator = z.object({
+  body: z.object({
+    email: z.string().trim().email("Email is invalid"),
+  }),
+});
+
+export const resetPasswordValidator = z.object({
+  body: z.object({
+    token: z.string().trim().min(1, "Token is required"),
+    password: z
+      .string()
+      .trim()
+      .min(8, "Password must be at least 8 characters"),
+  }),
+});

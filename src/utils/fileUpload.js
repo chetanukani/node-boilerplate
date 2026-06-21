@@ -1,5 +1,5 @@
 import fs from "fs";
-import path from "path";
+import { env } from "../config/index.js";
 import S3Service from "./s3.js";
 
 /**
@@ -126,6 +126,6 @@ export const getFileUrl = (localPath) => {
   if (S3Service.isEnabled()) {
     return S3Service.getUrl(localPath);
   } else {
-    return `${process.env.HOST_URL}/images/${localPath}`;
+    return `${env.HOST_URL}/files/${localPath}`;
   }
 };
