@@ -41,8 +41,6 @@ const errorHandler = (err, req, res, next) => {
     ...(process.env.NODE_ENV === "development" ? { stack: error.stack } : {}), // Error stack traces should be visible in development for debugging
   };
 
-  console.error(`${error.message}`);
-
   removeUnusedMulterImageFilesOnError(req);
   removeUnusedS3FileUploadsOnError(req);
   // Send error response

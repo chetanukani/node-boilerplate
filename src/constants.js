@@ -66,6 +66,7 @@ export const USER_TEMPORARY_TOKEN_EXPIRY = 20 * 60 * 1000; // 20 minutes
 
 export const MAXIMUM_SUB_IMAGE_COUNT = 4;
 export const MAXIMUM_SOCIAL_POST_IMAGE_COUNT = 6;
+export const MAXIMUM_BULK_PRODUCT_COUNT = 50;
 
 export const paypalBaseUrl = {
   sandbox: "https://api-m.sandbox.paypal.com",
@@ -166,6 +167,10 @@ export const ValidationMessages = {
   UnAuthorized: "Unauthorized request",
   NotAllowed: "You are not allowed to perform this action",
   ImageRequired: "Main image is required",
+  ProductsRequired: "At least one product is required",
+  InvalidProductsJson: "products must be a valid JSON array",
+  BulkProductLimitExceeded: "Bulk product limit exceeded",
+  ProductMediaRequired: "Media is required for each product",
   InvalidAurTokenExpired: "Invalid or expired password reset token",
   DevOnlyService: "This service is only available in the local environment",
 };
@@ -179,6 +184,8 @@ export const ResponseMessages = {
   LoginSuccess: "User logged in successfully",
   ProfileFetchSuccess: "Profile fetched successful",
   ProductCreatedSuccess: "Product created successfully",
+  MediaUploadSuccess: "Media uploaded successfully",
+  ProductsBulkCreatedSuccess: "Products created successfully",
   PasswordResetEmailSent:
     "If an account exists, password reset instructions have been sent.",
   PasswordResetSuccess: "Password has been reset successfully",

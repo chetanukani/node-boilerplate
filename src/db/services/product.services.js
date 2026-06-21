@@ -8,6 +8,10 @@ class ProductService {
     return product.save();
   };
 
+  static addProducts = async (products) => {
+    return Product.insertMany(products, { ordered: true });
+  };
+
   static getProductById = (id, lean = false) => {
     return new ProjectionBuilder(async function () {
       return Product.findOne({ [TableFields.ID]: id }, this).lean(lean);

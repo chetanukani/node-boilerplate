@@ -57,6 +57,44 @@ export const handleMultipleFilesUpload = async (files, folder, req = null) => {
 };
 
 /**
+ * Uploads indexed file fields (media_0, media_1, …) and attaches them to each item.
+ * Reusable for any bulk module — only change prefix, folder, and attachKey.
+ *
+ * @template T
+ * @param {object} options
+ * @param {T[]} options.items
+ * @param {Record<string, Express.Multer.File[]>} [options.files]
+ * @param {string} options.fieldPrefix - e.g. "media_"
+ * @param {string} options.folder - storage folder e.g. "products"
+ * @param {import("express").Request} options.req
+ * @param {string} [options.attachKey="media"]
+ * @returns {Promise<Array<T & Record<string, { url: string }[]>>>}
+ */
+export const attachIndexedFiles = async ({
+  items,
+  files,
+  fieldPrefix,
+  folder,
+  req,
+  attachKey = "media",
+}) => {
+  return Promise.all(
+    items.map(async (item, index) => {
+      const uploadedMedia = await handleMultipleFilesUpload(
+        files?.[`${fieldPrefix}${index}`],
+        folder,
+        req
+      );
+
+      return {
+        ...item,
+        [attachKey]: uploadedMedia,
+      };
+    })
+  );
+};
+
+/**
  * @description Deletes file from storage
  * @param {string} localPath - Path stored in DB
  * @returns {Promise<void>}

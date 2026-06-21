@@ -1,13 +1,35 @@
 import { Router } from "express";
-
-import { createProduct } from "../controllers/products/product.controllers.js";
-import { createProductValidator } from "../validators/product.validators.js";
-import { validate } from "../validators/validate.js";
-import { MAXIMUM_SUB_IMAGE_COUNT } from "../constants.js";
+import { validateRequest } from "../middlewares/zodValidate.middleware.js";
+import {
+  MAXIMUM_BULK_PRODUCT_COUNT,
+  MAXIMUM_SUB_IMAGE_COUNT,
+} from "../constants.js";
 import uploadFor from "../middlewares/multer.middlewares.js";
-// import uploadFor from "../middlewares/multerFactory.js";
+
+import {
+  bulkCreateProducts,
+  createProduct,
+} from "../controllers/products/product.controllers.js";
+import {
+  bulkCreateProductsSchema,
+  createProductSchema,
+} from "../schemas/product.schemas.js";
 
 const router = Router();
+
+const buildBulkProductUploadFields = () =>
+  Array.from({ length: MAXIMUM_BULK_PRODUCT_COUNT }, (_, index) => ({
+    name: `media_${index}`,
+    maxCount: MAXIMUM_SUB_IMAGE_COUNT,
+  }));
+
+router
+  .route("/bulk")
+  .post(
+    uploadFor("products").fields(buildBulkProductUploadFields()),
+    validateRequest(bulkCreateProductsSchema),
+    bulkCreateProducts
+  );
 
 router.route("/").post(
   uploadFor("products").fields([
@@ -16,8 +38,7 @@ router.route("/").post(
       maxCount: MAXIMUM_SUB_IMAGE_COUNT,
     },
   ]),
-  createProductValidator(),
-  validate,
+  validateRequest(createProductSchema),
   createProduct
 );
 

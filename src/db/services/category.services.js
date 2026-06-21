@@ -1,5 +1,6 @@
 import { TableFields } from "../../constants.js";
 import Util from "../../utils/util.js";
+import { MongoUtil } from "../index.js";
 import { Category } from "../models/category.models.js";
 
 class CategoryService {
@@ -26,6 +27,15 @@ class CategoryService {
   static getCategoryById = (id, lean = false) => {
     return new ProjectionBuilder(async function () {
       return Category.findOne({ [TableFields.ID]: id }, this).lean(lean);
+    });
+  };
+
+  static getCategoryByIds = (ids, lean = false) => {
+    return new ProjectionBuilder(async function () {
+      return Category.find(
+        { [TableFields.ID]: { $in: ids.map((a) => MongoUtil.toObjectId(a)) } },
+        this
+      ).lean(lean);
     });
   };
 
