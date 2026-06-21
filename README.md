@@ -44,12 +44,7 @@ See [`.env.sample`](./.env.sample) for the full list. Required:
 - `ACCESS_TOKEN_SECRET`
 - `REFRESH_TOKEN_SECRET`
 
-## API examples
-
-- REST Client: [`examples/api.http`](./examples/api.http)
-- Postman: import [`examples/postman_collection.json`](./examples/postman_collection.json)
-
-### Route pattern
+## API routes
 
 ```
 JSON:      validateRequest(validator) → controller
@@ -85,18 +80,20 @@ When domains grow, colocate under `src/modules/<domain>/`. See [`src/modules/REA
 
 ## Docker
 
+### Production image
+
 ```bash
 docker build -t node-boilerplate .
 docker run --env-file .env -p 8080:8080 node-boilerplate
 ```
 
-## Seed data
+### Local MongoDB
 
 ```bash
-yarn seed
+docker compose up -d
 ```
 
-Creates sample categories and `admin@example.com` / `Admin@12345` (if missing).
+Starts MongoDB on `localhost:27017` (matches `.env.sample`). Run the app on your host with `yarn dev`.
 
 ## Security notes
 
@@ -115,6 +112,5 @@ src/
 ├── routes/
 ├── controllers/
 ├── db/models|services/
-├── observability/
 └── modules/         # Feature-module pattern docs
 ```
