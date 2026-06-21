@@ -11,6 +11,7 @@ import {
   logoutAllSessions,
   listSessions,
   testingAppSetting,
+  testingSocketEmit,
 } from "../controllers/user/user.controllers.js";
 import { verifyJWT } from "../middlewares/auth.middlewares.js";
 import { validateRequest } from "../middlewares/zodValidate.middleware.js";
@@ -42,5 +43,7 @@ router
 
 router.route("/simulate").post(verifyJWT, simulateNotification);
 router.route("/testing-app-setting").get(testingAppSetting);
+
+router.route("/testing-socket-emit").get(testingSocketEmit);
 
 export default router;

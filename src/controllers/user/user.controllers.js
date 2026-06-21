@@ -17,6 +17,7 @@ import SessionService from "../../db/services/session.services.js";
 import NotificationService from "../../db/services/notification/notification.services.js";
 import { sendEmail, forgotPasswordMailgenContent } from "../../utils/mail.js";
 import { env } from "../../config/index.js";
+import { emitSocketEvent } from "../../socket/index.js";
 
 // prefer shared util functions
 const hashToken = (token) => Util.hashToken(token);
@@ -446,6 +447,13 @@ const testingAppSetting = asyncHandler(async (req, res, next) => {
     .json(new ApiResponse(StatusCodes.OK, {}, "App setting tested"));
 });
 
+const testingSocketEmit = asyncHandler(async (req, res, next) => {
+  emitSocketEvent(req, "101", "testing", { message: "This is testing" });
+  return res
+    .status(StatusCodes.OK)
+    .json(new ApiResponse(StatusCodes.OK, {}, "Socket emit event tested"));
+});
+
 export {
   registerUser,
   loginUser,
@@ -458,4 +466,5 @@ export {
   resetPassword,
   simulateNotification,
   testingAppSetting,
+  testingSocketEmit,
 };

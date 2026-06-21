@@ -3,9 +3,47 @@ import cookie from "cookie";
 import jwt from "jsonwebtoken";
 import { Server, Socket } from "socket.io";
 import { AvailableChatEvents, ChatEventEnum } from "../constants.js";
-import { User } from "../models/apps/auth/user.models.js";
-import { ApiError } from "../utils/ApiError.js";
-import { StatusCodes } from "http-status-codes";
+import { User } from "../db/models/user.models.js";
+
+const getHandshakeToken = (socket) => {
+  const cookies = cookie.parse(socket.handshake.headers?.cookie || "");
+  const authorization = socket.handshake.headers?.authorization;
+  const bearerToken = authorization?.startsWith("Bearer ")
+    ? authorization.slice(7).trim()
+    : null;
+
+  return (
+    cookies?.accessToken || socket.handshake.auth?.token || bearerToken || null
+  );
+};
+
+const mountSocketAuth = (io) => {
+  io.use(async (socket, next) => {
+    try {
+      const token = getHandshakeToken(socket);
+
+      if (!token) {
+        return next(new Error("Un-authorized handshake. Token is missing"));
+      }
+
+      const decodedToken = jwt.verify(token, env.ACCESS_TOKEN_SECRET);
+      const user = await User.findById(decodedToken?._id).select(
+        "-password -refreshToken -emailVerificationToken -emailVerificationExpiry"
+      );
+
+      if (!user) {
+        return next(new Error("Un-authorized handshake. Token is invalid"));
+      }
+
+      socket.user = user;
+      return next();
+    } catch (error) {
+      return next(
+        new Error(error?.message || "Un-authorized handshake. Token is invalid")
+      );
+    }
+  });
+};
 
 /**
  * @description This function is responsible to allow user to join the chat represented by chatId (chatId). event happens when user switches between the chats
@@ -14,9 +52,6 @@ import { StatusCodes } from "http-status-codes";
 const mountJoinChatEvent = (socket) => {
   socket.on(ChatEventEnum.JOIN_CHAT_EVENT, (chatId) => {
     console.log(`User joined the chat 🤝. chatId: `, chatId);
-    // joining the room with the chatId will allow specific events to be fired where we don't bother about the users like typing events
-    // E.g. When user types we don't want to emit that event to specific participant.
-    // We want to just emit that to the chat where the typing is happening
     socket.join(chatId);
   });
 };
@@ -42,74 +77,36 @@ const mountParticipantStoppedTypingEvent = (socket) => {
 };
 
 /**
- *
  * @param {Server<import("socket.io/dist/typed-events").DefaultEventsMap, import("socket.io/dist/typed-events").DefaultEventsMap, import("socket.io/dist/typed-events").DefaultEventsMap, any>} io
  */
 const initializeSocketIO = (io) => {
-  return io.on("connection", async (socket) => {
-    try {
-      // parse the cookies from the handshake headers (This is only possible if client has `withCredentials: true`)
-      const cookies = cookie.parse(socket.handshake.headers?.cookie || "");
+  mountSocketAuth(io);
 
-      let token = cookies?.accessToken; // get the accessToken
-
-      if (!token) {
-        // If there is no access token in cookies. Check inside the handshake auth
-        token = socket.handshake.auth?.token;
-      }
-
-      if (!token) {
-        // Token is required for the socket to work
-        throw new ApiError(
-          StatusCodes.UNAUTHORIZED,
-          "Un-authorized handshake. Token is missing"
-        );
-      }
-
-      const decodedToken = jwt.verify(token, env.ACCESS_TOKEN_SECRET); // decode the token
-
-      const user = await User.findById(decodedToken?._id).select(
-        "-password -refreshToken -emailVerificationToken -emailVerificationExpiry"
-      );
-
-      // retrieve the user
-      if (!user) {
-        throw new ApiError(
-          StatusCodes.UNAUTHORIZED,
-          "Un-authorized handshake. Token is invalid"
-        );
-      }
-      socket.user = user; // mount te user object to the socket
-
-      // We are creating a room with user id so that if user is joined but does not have any active chat going on.
-      // still we want to emit some socket events to the user.
-      // so that the client can catch the event and show the notifications.
-      socket.join(user._id.toString());
-      socket.emit(ChatEventEnum.CONNECTED_EVENT); // emit the connected event so that client is aware
-      console.log("User connected 🗼. userId: ", user._id.toString());
-
-      // Common events that needs to be mounted on the initialization
-      mountJoinChatEvent(socket);
-      mountParticipantTypingEvent(socket);
-      mountParticipantStoppedTypingEvent(socket);
-
-      socket.on(ChatEventEnum.DISCONNECT_EVENT, () => {
-        console.log("user has disconnected 🚫. userId: " + socket.user?._id);
-        if (socket.user?._id) {
-          socket.leave(socket.user._id);
-        }
-      });
-    } catch (error) {
-      socket.emit(
-        ChatEventEnum.SOCKET_ERROR_EVENT,
-        error?.message || "Something went wrong while connecting to the socket."
-      );
+  return io.on("connection", (socket) => {
+    const user = socket.user;
+    if (!user) {
+      socket.disconnect(true);
+      return;
     }
+
+    socket.join(user._id.toString());
+    socket.emit(ChatEventEnum.CONNECTED_EVENT);
+    console.log("User connected 🗼. userId: ", user._id.toString());
+
+    mountJoinChatEvent(socket);
+    mountParticipantTypingEvent(socket);
+    mountParticipantStoppedTypingEvent(socket);
+
+    socket.on(ChatEventEnum.DISCONNECT_EVENT, () => {
+      console.log("user has disconnected 🚫. userId: " + socket.user?._id);
+      if (socket.user?._id) {
+        socket.leave(socket.user._id);
+      }
+    });
   });
 };
 
 /**
- *
  * @param {import("express").Request} req - Request object to access the `io` instance set at the entry point
  * @param {string} roomId - Room where the event should be emitted
  * @param {AvailableChatEvents[0]} event - Event that should be emitted

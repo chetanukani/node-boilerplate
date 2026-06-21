@@ -4,6 +4,7 @@ import express from "express";
 import helmet from "helmet";
 import { rateLimit } from "express-rate-limit";
 import { createServer } from "http";
+// import { Server } from "socket.io";
 import morganMiddleware from "./logger/morgan.logger.js";
 import { ApiError } from "./utils/ApiError.js";
 import { StatusCodes } from "http-status-codes";
@@ -11,9 +12,20 @@ import versionMiddleware from "./middlewares/version.middlewares.js";
 import appVersionRouter from "./routes/appVersion.routes.js";
 import healthRouter from "./routes/health.routes.js";
 import { env } from "./config/index.js";
+import { initializeSocketIO } from "./socket/index.js";
 
 const app = express();
 const httpServer = createServer(app);
+
+// const io = new Server(httpServer, {
+//   pingTimeout: 60000,
+//   cors: {
+//     origin: env.CORS_ORIGIN,
+//     credentials: true,
+//   },
+// });
+
+//app.set("io", io); // using set method to mount the `io` instance on the app to avoid usage of `global`
 
 if (env.TRUST_PROXY) {
   app.set("trust proxy", 1);
@@ -73,6 +85,9 @@ app.use((req, res, next) => {
     )
   );
 });
+
+//If Socket wants to use uncomment this below line
+// initializeSocketIO(io);
 
 app.use(errorHandler);
 
