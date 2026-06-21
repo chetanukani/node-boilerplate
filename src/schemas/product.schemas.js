@@ -1,24 +1,19 @@
-import mongoose from "mongoose";
 import { z } from "zod";
 import {
   MAXIMUM_BULK_PRODUCT_COUNT,
   MAXIMUM_SUB_IMAGE_COUNT,
   ValidationMessages,
 } from "../constants.js";
+import { objectIdSchema } from "./common.schemas.js";
 import { requireFileField, requireIndexedFiles } from "../utils/zodHelpers.js";
 
-const objectIdSchema = z
-  .string()
-  .trim()
-  .refine((value) => mongoose.Types.ObjectId.isValid(value), {
-    message: "Invalid category",
-  });
+const categoryIdSchema = objectIdSchema("category");
 
 /** Fields the client sends — no media urls */
 export const productFieldsSchema = z.object({
   name: z.string().trim().min(1, "Name is required"),
   description: z.string().trim().min(1, "Description is required"),
-  category: objectIdSchema,
+  category: categoryIdSchema,
   price: z.coerce.number().min(0, "Price must be a positive number"),
   stock: z.coerce.number().int().min(0).optional().default(0),
 });

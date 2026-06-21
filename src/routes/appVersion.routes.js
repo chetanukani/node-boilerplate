@@ -1,18 +1,16 @@
 import express from "express";
-import { appVersionRequestBodyValidator } from "../validators/appVersion.validators.js";
 import {
   updateOrAddAppSettings,
   getAllAppVersion,
 } from "../controllers/admin/appVersion.controllers.js";
-import { validate } from "../validators/validate.js";
+import { validateRequest } from "../middlewares/zodValidate.middleware.js";
+import { updateAppVersionSchema } from "../schemas/appVersion.schemas.js";
 
 const router = express.Router();
 
-// Create or update config for a platform (single endpoint)
 router.patch(
   "/:platform",
-  appVersionRequestBodyValidator(),
-  validate,
+  validateRequest(updateAppVersionSchema),
   updateOrAddAppSettings
 );
 router.get("/", getAllAppVersion);
