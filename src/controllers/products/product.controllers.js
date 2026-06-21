@@ -33,7 +33,7 @@ const assertCategoriesExist = async (categoryIds) => {
 
 const createProduct = asyncHandler(async (req, res) => {
   const { body, files } = req.validated;
-  const { name, description, category, price, stock } = body;
+  const { name, description, category, price, stock, tags } = body;
 
   const categoryToBeAdded = await CategoryService.getCategoryById(category)
     .withName()
@@ -61,6 +61,7 @@ const createProduct = asyncHandler(async (req, res) => {
     price,
     category,
     media: mediaFiles,
+    ...(tags && { tags }),
   });
 
   return res

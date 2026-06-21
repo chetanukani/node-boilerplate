@@ -31,6 +31,10 @@ const productSchema = new Schema(
         [TableFields.mediaType]: Number,
       },
     ],
+    tags: {
+      name: { type: String },
+      description: { type: String },
+    },
   },
   {
     timestamps: true,

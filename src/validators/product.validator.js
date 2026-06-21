@@ -4,10 +4,20 @@ import {
   MAXIMUM_SUB_IMAGE_COUNT,
   ValidationMessages,
 } from "../constants.js";
-import { objectIdValidator } from "./common.validator.js";
+import {
+  nestedObjectValidator,
+  objectIdValidator,
+} from "./common.validator.js";
 import { requireFileField, requireIndexedFiles } from "../utils/zodHelpers.js";
 
 const categoryIdValidator = objectIdValidator("category");
+
+const productTagValidator = nestedObjectValidator(
+  z.object({
+    name: z.string().trim().min(1, "Tag name is required"),
+    description: z.string().trim().min(1, "Tag description is required"),
+  })
+);
 
 /** Fields the client sends — no media urls */
 export const productFieldsValidator = z.object({
@@ -16,6 +26,7 @@ export const productFieldsValidator = z.object({
   category: categoryIdValidator,
   price: z.coerce.number().min(0, "Price must be a positive number"),
   stock: z.coerce.number().int().min(0).optional().default(0),
+  tags: productTagValidator.optional(),
 });
 
 export const bulkProductFieldsValidator = z
