@@ -29,10 +29,6 @@ const errorHandler = (err, req, res, next) => {
     ...(env.NODE_ENV === "development" ? { stack: error.stack } : {}),
   };
 
-  if (req.requestId) {
-    res.setHeader("x-request-id", req.requestId);
-  }
-
   return res.status(error.statusCode).json(response);
 };
 

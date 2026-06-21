@@ -1,3 +1,4 @@
+import { env } from "../config/index.js";
 import { AvailableUserRoles, ValidationMessages } from "../constants.js";
 import UserService from "../db/services/user.services.js";
 import { ApiError } from "../utils/ApiError.js";
@@ -18,7 +19,7 @@ export const verifyJWT = asyncHandler(async (req, res, next) => {
   }
 
   try {
-    const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+    const decodedToken = jwt.verify(token, env.ACCESS_TOKEN_SECRET);
     const user = await UserService.findUserById(decodedToken?._id)
       .withBasicInfo()
       .execute();
@@ -54,7 +55,7 @@ export const getLoggedInUserOrIgnore = asyncHandler(async (req, res, next) => {
     req.header("Authorization")?.replace("Bearer ", "");
 
   try {
-    const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+    const decodedToken = jwt.verify(token, env.ACCESS_TOKEN_SECRET);
     const user = await UserService.findUserById(decodedToken?._id)
       .withBasicInfo()
       .execute();
@@ -88,7 +89,7 @@ export const verifyPermission = (roles = []) =>
   });
 
 export const avoidInProduction = asyncHandler(async (req, res, next) => {
-  if (process.env.NODE_ENV === "development") {
+  if (env.NODE_ENV === "development") {
     next();
   } else {
     throw new ApiError(

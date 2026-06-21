@@ -1,3 +1,4 @@
+import { env } from "../config/index.js";
 import cookie from "cookie";
 import jwt from "jsonwebtoken";
 import { Server, Socket } from "socket.io";
@@ -61,7 +62,7 @@ const initializeSocketIO = (io) => {
         throw new ApiError(401, "Un-authorized handshake. Token is missing");
       }
 
-      const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET); // decode the token
+      const decodedToken = jwt.verify(token, env.ACCESS_TOKEN_SECRET); // decode the token
 
       const user = await User.findById(decodedToken?._id).select(
         "-password -refreshToken -emailVerificationToken -emailVerificationExpiry"

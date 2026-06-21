@@ -39,18 +39,16 @@ const createTokensAndSession = async ({ userId, deviceId, ip, userAgent }) => {
     const jti = Util.generateJti();
     const refreshToken = jwt.sign(
       { _id: userId, jti },
-      process.env.REFRESH_TOKEN_SECRET,
+      env.REFRESH_TOKEN_SECRET,
       {
-        expiresIn: process.env.REFRESH_TOKEN_EXPIRY,
+        expiresIn: env.REFRESH_TOKEN_EXPIRY,
       }
     );
 
     const tokenHash = hashToken(refreshToken);
 
     // compute expiresAt (fallback to 30 days if not provided as ms env var)
-    const expiresMs = process.env.REFRESH_TOKEN_EXPIRY_MS
-      ? parseInt(process.env.REFRESH_TOKEN_EXPIRY_MS, 10)
-      : 30 * 24 * 60 * 60 * 1000;
+    const expiresMs = env.REFRESH_TOKEN_EXPIRY_MS ?? 30 * 24 * 60 * 60 * 1000;
     const expiresAt = new Date(Date.now() + expiresMs);
 
     await SessionService.createSession({
@@ -162,8 +160,8 @@ const loginUser = asyncHandler(async (req, res) => {
   // Cookie options: keep refresh token HttpOnly and Secure in production
   const options = {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
+    secure: env.NODE_ENV === "production",
+    sameSite: env.NODE_ENV === "production" ? "None" : "Lax",
   };
 
   return res
@@ -191,7 +189,7 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
 
   let decoded;
   try {
-    decoded = jwt.verify(token, process.env.REFRESH_TOKEN_SECRET);
+    decoded = jwt.verify(token, env.REFRESH_TOKEN_SECRET);
   } catch (err) {
     throw new ApiError(
       StatusCodes.UNAUTHORIZED,
@@ -235,9 +233,9 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
   const newJti = Util.generateJti();
   const newRefreshToken = jwt.sign(
     { _id: userId, jti: newJti },
-    process.env.REFRESH_TOKEN_SECRET,
+    env.REFRESH_TOKEN_SECRET,
     {
-      expiresIn: process.env.REFRESH_TOKEN_EXPIRY,
+      expiresIn: env.REFRESH_TOKEN_EXPIRY,
     }
   );
   const newTokenHash = hashToken(newRefreshToken);
@@ -252,8 +250,8 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
 
   const options = {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
+    secure: env.NODE_ENV === "production",
+    sameSite: env.NODE_ENV === "production" ? "None" : "Lax",
   };
 
   return res
@@ -360,7 +358,7 @@ const logoutUser = asyncHandler(async (req, res) => {
     req.header("Authorization")?.replace("Bearer ", "");
   if (token) {
     try {
-      const decoded = jwt.verify(token, process.env.REFRESH_TOKEN_SECRET);
+      const decoded = jwt.verify(token, env.REFRESH_TOKEN_SECRET);
       const session = await SessionService.findByJti(decoded.jti);
       if (session) await SessionService.revokeSessionById(session._id);
     } catch (err) {
@@ -370,7 +368,7 @@ const logoutUser = asyncHandler(async (req, res) => {
 
   const options = {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
+    secure: env.NODE_ENV === "production",
   };
 
   return res
@@ -388,7 +386,7 @@ const logoutAllSessions = asyncHandler(async (req, res) => {
 
   const options = {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
+    secure: env.NODE_ENV === "production",
   };
   return res
     .status(StatusCodes.OK)

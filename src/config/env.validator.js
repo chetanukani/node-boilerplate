@@ -46,10 +46,6 @@ const envSchema = z.object({
   FIREBASE_CLIENT_EMAIL: z.string().optional(),
   FIREBASE_PRIVATE_KEY: z.string().optional(),
   APP_VERSION_CACHE_TTL_SECONDS: z.coerce.number().default(30),
-  METRICS_ENABLED: z
-    .enum(["true", "false"])
-    .default("true")
-    .transform((value) => value === "true"),
 });
 
 export const parseEnv = () => {

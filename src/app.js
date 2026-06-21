@@ -11,8 +11,6 @@ import versionMiddleware from "./middlewares/version.middlewares.js";
 import appVersionRouter from "./routes/appVersion.routes.js";
 import healthRouter from "./routes/health.routes.js";
 import { env } from "./config/index.js";
-import { requestContext } from "./middlewares/requestContext.middleware.js";
-import { metricsMiddleware } from "./observability/metrics.js";
 
 const app = express();
 const httpServer = createServer(app);
@@ -22,8 +20,6 @@ if (env.TRUST_PROXY) {
 }
 
 app.use(helmet());
-app.use(requestContext);
-app.use(metricsMiddleware);
 
 app.use(
   cors({

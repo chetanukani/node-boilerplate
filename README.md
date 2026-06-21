@@ -79,12 +79,6 @@ All errors return a consistent shape:
 - Local: `public/files/` served at `/files/...`
 - S3: set `USE_S3=true` and AWS vars in `.env`
 
-## Observability
-
-- Request ID: `x-request-id` header
-- Prometheus metrics at `/metrics` (`METRICS_ENABLED=true`)
-- See [`src/observability/README.md`](./src/observability/README.md)
-
 ## Scaling the codebase
 
 When domains grow, colocate under `src/modules/<domain>/`. See [`src/modules/README.md`](./src/modules/README.md).

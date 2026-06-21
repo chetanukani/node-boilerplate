@@ -1,11 +1,9 @@
+import { env } from "../../config/index.js";
 import Util from "../../utils/util.js";
 import { AppVersion } from "../models/appVersion.models.js";
 
 const cache = new Map();
-const TTL_SECONDS = parseInt(
-  process.env.APP_VERSION_CACHE_TTL_SECONDS || "30",
-  10
-);
+const TTL_SECONDS = env.APP_VERSION_CACHE_TTL_SECONDS;
 
 async function getConfig(platform) {
   if (!platform) return null;
