@@ -39,9 +39,9 @@ app.use("/api/v1/products", productRouter);
 
 ## Current vs modular
 
-| Size | Layout |
-|------|--------|
+| Size        | Layout                                            |
+| ----------- | ------------------------------------------------- |
 | Small (now) | `src/routes`, `src/controllers`, `src/validators` |
-| Large team | `src/modules/<domain>/` colocated |
+| Large team  | `src/modules/<domain>/` colocated                 |
 
 Migrate one module at a time; do not big-bang refactor.

@@ -19,17 +19,16 @@ yarn dev
 ```
 
 Server: `http://localhost:8080`  
-Health: `GET /health` | Readiness: `GET /ready` | Metrics: `GET /metrics`
+Health: `GET /health` | Readiness: `GET /ready`
 
 ## Scripts
 
-| Script | Description |
-|--------|-------------|
-| `yarn start` | Production start |
-| `yarn dev` | Nodemon dev server |
-| `yarn seed` | Seed categories + admin user |
-| `yarn lint` | ESLint |
-| `yarn format` | Prettier write |
+| Script        | Description        |
+| ------------- | ------------------ |
+| `yarn start`  | Production start   |
+| `yarn dev`    | Nodemon dev server |
+| `yarn lint`   | ESLint             |
+| `yarn format` | Prettier write     |
 
 ## Configuration
 
