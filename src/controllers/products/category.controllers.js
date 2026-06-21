@@ -35,7 +35,10 @@ const getCategoryById = asyncHandler(async (req, res) => {
     .withId()
     .execute();
   if (!category) {
-    throw new ApiError(404, ValidationMessages.RecordNotFound);
+    throw new ApiError(
+      StatusCodes.NOT_FOUND,
+      ValidationMessages.RecordNotFound
+    );
   }
   return res
     .status(StatusCodes.OK)
@@ -47,7 +50,10 @@ const updateCategory = asyncHandler(async (req, res) => {
   const { name } = req.body;
   const category = await CategoryService.updateCategory(categoryId, { name });
   if (!category) {
-    throw new ApiError(404, ValidationMessages.RecordNotFound);
+    throw new ApiError(
+      StatusCodes.NOT_FOUND,
+      ValidationMessages.RecordNotFound
+    );
   }
 
   return res
@@ -60,7 +66,10 @@ const deleteCategory = asyncHandler(async (req, res) => {
   const category = await CategoryService.deleteCategory(categoryId);
 
   if (!category) {
-    throw new ApiError(404, ValidationMessages.RecordNotFound);
+    throw new ApiError(
+      StatusCodes.NOT_FOUND,
+      ValidationMessages.RecordNotFound
+    );
   }
 
   return res

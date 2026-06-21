@@ -66,7 +66,6 @@ class S3Service {
       });
 
       await this.s3Client.send(command);
-      console.log(`File uploaded to S3: ${key}`);
       return key; // Return only the relative path
     } catch (error) {
       console.error("S3 upload error:", error);
@@ -87,7 +86,6 @@ class S3Service {
       });
 
       await this.s3Client.send(command);
-      console.log(`File deleted from S3: ${key}`);
     } catch (error) {
       console.error("S3 delete error:", error);
       throw new Error(`Failed to delete file from S3: ${error.message}`);

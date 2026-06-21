@@ -5,6 +5,7 @@ import { Server, Socket } from "socket.io";
 import { AvailableChatEvents, ChatEventEnum } from "../constants.js";
 import { User } from "../models/apps/auth/user.models.js";
 import { ApiError } from "../utils/ApiError.js";
+import { StatusCodes } from "http-status-codes";
 
 /**
  * @description This function is responsible to allow user to join the chat represented by chatId (chatId). event happens when user switches between the chats
@@ -59,7 +60,10 @@ const initializeSocketIO = (io) => {
 
       if (!token) {
         // Token is required for the socket to work
-        throw new ApiError(401, "Un-authorized handshake. Token is missing");
+        throw new ApiError(
+          StatusCodes.UNAUTHORIZED,
+          "Un-authorized handshake. Token is missing"
+        );
       }
 
       const decodedToken = jwt.verify(token, env.ACCESS_TOKEN_SECRET); // decode the token
@@ -70,7 +74,10 @@ const initializeSocketIO = (io) => {
 
       // retrieve the user
       if (!user) {
-        throw new ApiError(401, "Un-authorized handshake. Token is invalid");
+        throw new ApiError(
+          StatusCodes.UNAUTHORIZED,
+          "Un-authorized handshake. Token is invalid"
+        );
       }
       socket.user = user; // mount te user object to the socket
 

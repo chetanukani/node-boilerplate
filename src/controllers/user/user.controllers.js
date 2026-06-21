@@ -63,21 +63,26 @@ const createTokensAndSession = async ({ userId, deviceId, ip, userAgent }) => {
 
     return { accessToken, refreshToken };
   } catch (error) {
-    throw new ApiError(500, ValidationMessages.SomethingWentWrong);
+    throw new ApiError(
+      StatusCodes.INTERNAL_SERVER_ERROR,
+      ValidationMessages.SomethingWentWrong
+    );
   }
 };
 
 const registerUser = asyncHandler(async (req, res) => {
-  const { email, username, password } = req.body;
+  const { email, username, password } = req.validated.body;
 
-  const existedUser = await UserService.findUserByUserNameOrEmail({
-    $or: [{ username }, { email }],
-  })
+  const existedUser = await UserService.findUserByEmail(email)
     .withId()
     .execute();
 
   if (existedUser) {
-    throw new ApiError(409, ValidationMessages.UserAlreadyExist, []);
+    throw new ApiError(
+      StatusCodes.BAD_REQUEST,
+      ValidationMessages.UserAlreadyExist,
+      []
+    );
   }
 
   const user = await UserService.addUser({
@@ -92,10 +97,6 @@ const registerUser = asyncHandler(async (req, res) => {
     .withBasicInfo()
     .execute();
 
-  if (!createdUser) {
-    throw new ApiError(500, ValidationMessages.SomethingWentWrong);
-  }
-
   return res
     .status(StatusCodes.CREATED)
     .json(
@@ -108,18 +109,9 @@ const registerUser = asyncHandler(async (req, res) => {
 });
 
 const loginUser = asyncHandler(async (req, res) => {
-  const { email, username, password } = req.body;
+  const { email, password } = req.validated.body;
 
-  if (!username && !email) {
-    throw new ApiError(
-      StatusCodes.BAD_REQUEST,
-      ValidationMessages.SomethingWentWrong
-    );
-  }
-
-  const user = await UserService.findUserByUserNameOrEmail({
-    $or: [{ username }, { email }],
-  })
+  const user = await UserService.findUserByEmail(email)
     .withId()
     .withPassword()
     .withLoginType()
@@ -127,8 +119,8 @@ const loginUser = asyncHandler(async (req, res) => {
 
   if (!user) {
     throw new ApiError(
-      StatusCodes.NOT_FOUND,
-      ValidationMessages.RecordNotFound
+      StatusCodes.UNAUTHORIZED,
+      ValidationMessages.InvalidCredentials
     );
   }
 
@@ -333,7 +325,10 @@ const resetPassword = asyncHandler(async (req, res) => {
     .execute();
 
   if (!user) {
-    throw new ApiError(400, ValidationMessages.InvalidAurTokenExpired);
+    throw new ApiError(
+      StatusCodes.BAD_REQUEST,
+      ValidationMessages.InvalidAurTokenExpired
+    );
   }
 
   user.password = password;
@@ -380,7 +375,11 @@ const logoutUser = asyncHandler(async (req, res) => {
 
 const logoutAllSessions = asyncHandler(async (req, res) => {
   const userId = req.user?.[TableFields.ID];
-  if (!userId) throw new ApiError(401, ValidationMessages.UnAuthorized);
+  if (!userId)
+    throw new ApiError(
+      StatusCodes.UNAUTHORIZED,
+      ValidationMessages.UnAuthorized
+    );
 
   await SessionService.revokeAllForUser(userId);
 
@@ -397,7 +396,11 @@ const logoutAllSessions = asyncHandler(async (req, res) => {
 
 const listSessions = asyncHandler(async (req, res) => {
   const userId = req.user?.[TableFields.ID];
-  if (!userId) throw new ApiError(401, ValidationMessages.UnAuthorized);
+  if (!userId)
+    throw new ApiError(
+      StatusCodes.UNAUTHORIZED,
+      ValidationMessages.UnAuthorized
+    );
 
   const sessions = await SessionService.listSessionsForUser(userId);
   return res
@@ -427,7 +430,8 @@ const getProfile = asyncHandler(async (req, res) => {
  */
 const simulateNotification = asyncHandler(async (req, res) => {
   const userId = req.user?.[TableFields.ID];
-  if (!userId) throw new ApiError(400, "userId is required");
+  if (!userId)
+    throw new ApiError(StatusCodes.BAD_REQUEST, "userId is required");
 
   await NotificationService.sendNotificationToUserById(userId);
 

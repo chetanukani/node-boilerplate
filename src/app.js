@@ -38,7 +38,7 @@ const limiter = rateLimit({
   legacyHeaders: false,
   handler: (_, __, ___, options) => {
     throw new ApiError(
-      options.statusCode || 500,
+      options.statusCode || StatusCodes.TOO_MANY_REQUESTS,
       `There are too many requests. You are only allowed ${options.max} requests per ${options.windowMs / 60000} minutes`
     );
   },
@@ -66,7 +66,12 @@ app.use("/api/v1/categories", categoryRouter);
 app.use("/api/v1/products", productRouter);
 
 app.use((req, res, next) => {
-  next(new ApiError(404, `Route not found: ${req.method} ${req.originalUrl}`));
+  next(
+    new ApiError(
+      StatusCodes.NOT_FOUND,
+      `Route not found: ${req.method} ${req.originalUrl}`
+    )
+  );
 });
 
 app.use(errorHandler);

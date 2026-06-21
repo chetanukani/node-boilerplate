@@ -8,9 +8,9 @@ class UserService {
     return await user.save();
   };
 
-  static findUserByUserNameOrEmail = (qry) => {
+  static findUserByEmail = (email) => {
     return new ProjectionBuilder(async function () {
-      return await User.findOne(qry, this);
+      return await User.findOne({ [TableFields.email]: email }, this);
     });
   };
 

@@ -30,10 +30,8 @@ const userSchema = new Schema(
     [TableFields.username]: {
       type: String,
       required: true,
-      unique: true,
       lowercase: true,
       trim: true,
-      index: true,
     },
     [TableFields.email]: {
       type: String,
