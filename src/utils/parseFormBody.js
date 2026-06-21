@@ -1,6 +1,26 @@
 /**
  * Multer may send a JSON string or a nested array from bracket notation (products[0][name]).
  */
+export const coerceBooleanValue = (value) => {
+  if (typeof value === "boolean") {
+    return value;
+  }
+
+  if (typeof value === "string") {
+    const normalized = value.trim().toLowerCase();
+
+    if (normalized === "true") {
+      return true;
+    }
+
+    if (normalized === "false") {
+      return false;
+    }
+  }
+
+  return value;
+};
+
 export const coerceJsonFormField = (value) => {
   if (Array.isArray(value)) {
     return value;
@@ -42,6 +62,13 @@ export const normalizeFormBody = (body) => {
     }
 
     const trimmed = value.trim();
+    const coercedBoolean = coerceBooleanValue(value);
+
+    if (typeof coercedBoolean === "boolean") {
+      normalizedBody[key] = coercedBoolean;
+      continue;
+    }
+
     if (trimmed.startsWith("[") || trimmed.startsWith("{")) {
       normalizedBody[key] = coerceJsonFormField(value);
     }

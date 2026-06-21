@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { AvailableUserRoles } from "../constants.js";
 
-export const userRegisterSchema = z.object({
+export const userRegisterValidator = z.object({
   body: z.object({
     email: z
       .string()
@@ -21,7 +21,7 @@ export const userRegisterSchema = z.object({
   }),
 });
 
-export const userLoginSchema = z.object({
+export const userLoginValidator = z.object({
   body: z
     .object({
       email: z.string().trim().email("Email is invalid").optional(),

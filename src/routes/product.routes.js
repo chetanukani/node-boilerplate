@@ -5,15 +5,14 @@ import {
   MAXIMUM_SUB_IMAGE_COUNT,
 } from "../constants.js";
 import uploadFor from "../middlewares/multer.middlewares.js";
-
 import {
   bulkCreateProducts,
   createProduct,
 } from "../controllers/products/product.controllers.js";
 import {
-  bulkCreateProductsSchema,
-  createProductSchema,
-} from "../schemas/product.schemas.js";
+  bulkCreateProductsValidator,
+  createProductValidator,
+} from "../validators/product.validator.js";
 
 const router = Router();
 
@@ -27,7 +26,7 @@ router
   .route("/bulk")
   .post(
     uploadFor("products").fields(buildBulkProductUploadFields()),
-    validateRequest(bulkCreateProductsSchema),
+    validateRequest(bulkCreateProductsValidator),
     bulkCreateProducts
   );
 
@@ -38,7 +37,7 @@ router.route("/").post(
       maxCount: MAXIMUM_SUB_IMAGE_COUNT,
     },
   ]),
-  validateRequest(createProductSchema),
+  validateRequest(createProductValidator),
   createProduct
 );
 

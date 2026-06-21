@@ -8,22 +8,22 @@ import {
 } from "../controllers/products/category.controllers.js";
 import { validateRequest } from "../middlewares/zodValidate.middleware.js";
 import {
-  categoryIdParamsSchema,
-  createCategorySchema,
-  updateCategorySchema,
-} from "../schemas/category.schemas.js";
+  categoryIdParamsValidator,
+  createCategoryValidator,
+  updateCategoryValidator,
+} from "../validators/category.validator.js";
 
 const router = Router();
 
 router
   .route("/")
-  .post(validateRequest(createCategorySchema), createCategory)
+  .post(validateRequest(createCategoryValidator), createCategory)
   .get(listCategories);
 
 router
   .route("/:categoryId")
-  .get(validateRequest(categoryIdParamsSchema), getCategoryById)
-  .patch(validateRequest(updateCategorySchema), updateCategory)
-  .delete(validateRequest(categoryIdParamsSchema), deleteCategory);
+  .get(validateRequest(categoryIdParamsValidator), getCategoryById)
+  .patch(validateRequest(updateCategoryValidator), updateCategory)
+  .delete(validateRequest(categoryIdParamsValidator), deleteCategory);
 
 export default router;

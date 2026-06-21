@@ -9,11 +9,11 @@ import { normalizeFormBody } from "../utils/parseFormBody.js";
  * Runs after route-level multer when the route accepts multipart/form-data.
  *
  * @template T
- * @param {import("zod").ZodSchema<T>} schema
+ * @param {import("zod").ZodSchema<T>} validator
  * @returns {import("express").RequestHandler}
  */
-export const validateRequest = (schema) => (req, res, next) => {
-  const result = schema.safeParse({
+export const validateRequest = (validator) => (req, res, next) => {
+  const result = validator.safeParse({
     body: normalizeFormBody(req.body),
     query: req.query,
     params: req.params,

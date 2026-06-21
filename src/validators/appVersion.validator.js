@@ -1,9 +1,10 @@
 import { z } from "zod";
 import { PlatformType } from "../constants.js";
+import { booleanValidator } from "./common.validator.js";
 
 const platformValues = Object.values(PlatformType);
 
-export const updateAppVersionSchema = z.object({
+export const updateAppVersionValidator = z.object({
   params: z.object({
     platform: z
       .string()
@@ -15,7 +16,7 @@ export const updateAppVersionSchema = z.object({
   }),
   body: z.object({
     version: z.string().trim().min(1, "version is required"),
-    forceUpdate: z.boolean({ message: "forceUpdate must be boolean" }),
-    maintenance: z.boolean({ message: "maintenance must be boolean" }),
+    forceUpdate: booleanValidator("forceUpdate must be boolean"),
+    maintenance: booleanValidator("maintenance must be boolean"),
   }),
 });

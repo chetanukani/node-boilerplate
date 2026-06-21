@@ -15,16 +15,16 @@ import {
 import { verifyJWT } from "../middlewares/auth.middlewares.js";
 import { validateRequest } from "../middlewares/zodValidate.middleware.js";
 import {
-  userLoginSchema,
-  userRegisterSchema,
-} from "../schemas/user.schemas.js";
+  userLoginValidator,
+  userRegisterValidator,
+} from "../validators/user.validator.js";
 
 const router = Router();
 
 router
   .route("/register")
-  .post(validateRequest(userRegisterSchema), registerUser);
-router.route("/login").post(validateRequest(userLoginSchema), loginUser);
+  .post(validateRequest(userRegisterValidator), registerUser);
+router.route("/login").post(validateRequest(userLoginValidator), loginUser);
 
 router.route("/logout").post(verifyJWT, logoutUser);
 router.route("/profile").get(verifyJWT, getProfile);
