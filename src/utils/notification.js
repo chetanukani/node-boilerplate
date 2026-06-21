@@ -67,6 +67,10 @@ export async function sendNotificationToTokens(
   tokens = [],
   { message, type, title, messageObj }
 ) {
+  if (!tokens.length) {
+    return { successCount: 0, failureCount: 0, errors: [] };
+  }
+
   initFirebaseAdmin();
   const messaging = getMessaging();
 
@@ -76,7 +80,7 @@ export async function sendNotificationToTokens(
   for (const chunk of chunks) {
     try {
       const resp = await messaging.sendEachForMulticast(
-        createObj(tokens, message, type, title, messageObj)
+        createObj(chunk, message, type, title, messageObj)
       );
       results.successCount += resp.successCount;
       results.failureCount += resp.failureCount;

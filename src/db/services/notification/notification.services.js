@@ -3,7 +3,6 @@ import { Notification } from "../../models/notification.models.js";
 import { sendNotificationToTokens } from "../../../utils/notification.js";
 import { TableFields } from "../../../constants.js";
 import { NotificationMessageGenerator } from "./notification.messages.js";
-import { title } from "process";
 
 function createNotificationObject(
   userId,
@@ -50,15 +49,14 @@ class NotificationService {
     if (!userId) return;
 
     const user = await User.findById(userId, {
-      [TableFields.fcmTokens]: {
-        $map: {
-          input: "$" + TableFields.fcmTokens,
-          as: "b",
-          in: "$$b." + TableFields.token,
-        },
-      },
+      [TableFields.fcmTokens]: 1,
     }).lean();
     if (!user) return;
+
+    const tokens = (user[TableFields.fcmTokens] || [])
+      .map((entry) => entry?.[TableFields.token])
+      .filter(Boolean);
+    if (!tokens.length) return;
 
     const msg = NotificationMessageGenerator.Testing.generate();
     const metadataObj = {
@@ -77,12 +75,9 @@ class NotificationService {
       message: msg.message,
       type: msg.type,
       title: msg.title,
-      metadataObj,
+      messageObj: metadataObj,
     };
-    const result = await sendNotificationToTokens(
-      user[TableFields.fcmTokens],
-      fcmObj
-    );
+    const result = await sendNotificationToTokens(tokens, fcmObj);
 
     // Remove invalid tokens from user (keep this logic, it's useful and simple)
     if (result.errors && result.errors.length) {
