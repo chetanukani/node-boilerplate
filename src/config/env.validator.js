@@ -46,6 +46,16 @@ const envSchema = z.object({
   FIREBASE_CLIENT_EMAIL: z.string().optional(),
   FIREBASE_PRIVATE_KEY: z.string().optional(),
   APP_VERSION_CACHE_TTL_SECONDS: z.coerce.number().default(30),
+  ENABLE_CRON: z
+    .enum(["true", "false"])
+    .default("true")
+    .transform((value) => value === "true"),
+  CRON_TIMEZONE: z.string().default("UTC"),
+  CRON_CLEANUP_EXPIRED_SESSIONS_ENABLED: z
+    .enum(["true", "false"])
+    .default("true")
+    .transform((value) => value === "true"),
+  CRON_CLEANUP_EXPIRED_SESSIONS_SCHEDULE: z.string().default("0 * * * *"),
 });
 
 export const parseEnv = () => {

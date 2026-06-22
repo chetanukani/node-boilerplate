@@ -2,6 +2,7 @@ import "./config/index.js";
 import { httpServer } from "./app.js";
 import connectDB, { disconnectDB } from "./db/index.js";
 import { env } from "./config/index.js";
+import { initializeCronJobs, stopCronJobs } from "./cron/index.js";
 
 const startServer = () => {
   httpServer.listen(env.PORT, () => {
@@ -16,6 +17,7 @@ const startServer = () => {
 
 const gracefulShutdown = (signalOrError, exitCode = 0) => {
   console.log(`Shutting down server (${signalOrError})...`);
+  stopCronJobs();
   httpServer.close(async () => {
     console.log("HTTP server closed.");
     try {
@@ -49,6 +51,7 @@ process.on("unhandledRejection", (reason) => {
 try {
   await connectDB();
   startServer();
+  // initializeCronJobs();
 } catch (err) {
   console.error("Mongo db connect error: ", err);
   process.exit(1);
