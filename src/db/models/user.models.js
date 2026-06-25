@@ -4,10 +4,8 @@ import jwt from "jsonwebtoken";
 import mongoose, { Schema } from "mongoose";
 import { env } from "../../config/index.js";
 import {
-  AvailableSocialLogins,
   AvailableUserRoles,
   USER_TEMPORARY_TOKEN_EXPIRY,
-  UserLoginType,
   UserRolesEnum,
   TableFields,
   TableNames,
@@ -17,16 +15,6 @@ import {
 
 const userSchema = new Schema(
   {
-    [TableFields.avatar]: {
-      type: {
-        url: String,
-        localPath: String,
-      },
-      default: {
-        url: `https://via.placeholder.com/200x200.png`,
-        localPath: "",
-      },
-    },
     [TableFields.username]: {
       type: String,
       required: true,
@@ -49,11 +37,6 @@ const userSchema = new Schema(
     [TableFields.password]: {
       type: String,
       required: [true, ValidationMessages.PasswordRequired],
-    },
-    [TableFields.loginType]: {
-      type: String,
-      enum: AvailableSocialLogins,
-      default: UserLoginType.EMAIL_PASSWORD,
     },
     [TableFields.isEmailVerified]: {
       type: Boolean,

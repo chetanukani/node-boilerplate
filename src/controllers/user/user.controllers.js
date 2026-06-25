@@ -4,7 +4,6 @@ import jwt from "jsonwebtoken";
 import {
   ResponseMessages,
   TableFields,
-  UserLoginType,
   UserRolesEnum,
   ValidationMessages,
 } from "../../constants.js";
@@ -115,7 +114,6 @@ const loginUser = asyncHandler(async (req, res) => {
   const user = await UserService.findUserByEmail(email)
     .withId()
     .withPassword()
-    .withLoginType()
     .execute();
 
   if (!user) {

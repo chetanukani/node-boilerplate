@@ -1,6 +1,6 @@
+import express from "express";
 import cookieParser from "cookie-parser";
 import cors from "cors";
-import express from "express";
 import helmet from "helmet";
 import { rateLimit } from "express-rate-limit";
 import { createServer } from "http";
@@ -13,6 +13,10 @@ import appVersionRouter from "./routes/appVersion.routes.js";
 import healthRouter from "./routes/health.routes.js";
 import { env } from "./config/index.js";
 import { initializeSocketIO } from "./socket/index.js";
+import { errorHandler } from "./middlewares/error.middlewares.js";
+import userRouter from "./routes/user.routes.js";
+import categoryRouter from "./routes/category.routes.js";
+import productRouter from "./routes/product.routes.js";
 
 const app = express();
 const httpServer = createServer(app);
@@ -63,11 +67,6 @@ app.use(express.urlencoded({ extended: true, limit: "1mb" }));
 app.use(express.static("public"));
 app.use(cookieParser());
 app.use(morganMiddleware);
-
-import { errorHandler } from "./middlewares/error.middlewares.js";
-import userRouter from "./routes/user.routes.js";
-import categoryRouter from "./routes/category.routes.js";
-import productRouter from "./routes/product.routes.js";
 
 app.use(healthRouter);
 

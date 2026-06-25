@@ -49,7 +49,6 @@ class ProjectionBuilder {
     };
 
     this.withBasicInfo = () => {
-      projection[TableFields.avatar] = 1;
       projection[TableFields.email] = 1;
       projection[TableFields.username] = 1;
       projection[TableFields.role] = 1;
@@ -58,11 +57,6 @@ class ProjectionBuilder {
 
     this.withPassword = () => {
       projection[TableFields.password] = 1;
-      return this;
-    };
-
-    this.withLoginType = () => {
-      projection[TableFields.loginType] = 1;
       return this;
     };
 

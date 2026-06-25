@@ -56,6 +56,16 @@ const envSchema = z.object({
     .default("true")
     .transform((value) => value === "true"),
   CRON_CLEANUP_EXPIRED_SESSIONS_SCHEDULE: z.string().default("0 * * * *"),
+  ENABLE_STRIPE: z
+    .enum(["true", "false"])
+    .default("false")
+    .transform((value) => value === "true"),
+  STRIPE_SECRET_KEY: z.string().optional(),
+  STRIPE_PUBLISHABLE_KEY: z.string().optional(),
+  STRIPE_WEBHOOK_SECRET: z.string().optional(),
+  STRIPE_DEFAULT_CURRENCY: z.string().default("usd"),
+  STRIPE_CHECKOUT_SUCCESS_URL: z.string().optional(),
+  STRIPE_CHECKOUT_CANCEL_URL: z.string().optional(),
 });
 
 export const parseEnv = () => {
