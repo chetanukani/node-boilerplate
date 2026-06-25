@@ -14,7 +14,8 @@ import { asyncHandler } from "../../utils/asyncHandler.js";
 import UserService from "../../db/services/user.services.js";
 import SessionService from "../../db/services/session.services.js";
 import NotificationService from "../../db/services/notification/notification.services.js";
-import { sendEmail, forgotPasswordMailgenContent } from "../../utils/mail.js";
+import { sendEmail } from "../../utils/mail.js";
+import { forgotPasswordMailgenContent } from "../../templates/forgotPassword.template.js";
 import { env } from "../../config/index.js";
 import { emitSocketEvent } from "../../socket/index.js";
 
@@ -261,7 +262,7 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
 const forgotPassword = asyncHandler(async (req, res) => {
   const { email } = req.validated.body;
 
-  const user = await UserService.findUserByUserNameOrEmail({ email })
+  const user = await UserService.findUserByEmail(email)
     .withId()
     .withBasicInfo()
     .execute();
@@ -283,7 +284,7 @@ const forgotPassword = asyncHandler(async (req, res) => {
   const { unHashedToken, hashedToken, tokenExpiry } =
     user.generateTemporaryToken();
 
-  await UserService.updateUser(user._id, {
+  await UserService.updateUser(user[TableFields.ID], {
     $set: {
       forgotPasswordToken: hashedToken,
       forgotPasswordExpiry: new Date(tokenExpiry),
