@@ -51,6 +51,7 @@ export const TableNames = {
   Product: "products",
   Notification: "notifications",
   Session: "sessions",
+  CMSPages: "cms_pages",
 };
 
 /**

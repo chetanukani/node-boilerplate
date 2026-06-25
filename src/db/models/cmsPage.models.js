@@ -1,4 +1,5 @@
 import mongoose, { Schema } from "mongoose";
+import { TableNames } from "../../constants.js";
 
 const cmsPageSchema = new Schema(
   {
@@ -24,4 +25,4 @@ const cmsPageSchema = new Schema(
   { timestamps: true }
 );
 
-export const CmsPage = mongoose.model("cms_pages", cmsPageSchema);
+export const CmsPage = mongoose.model(TableNames.CMSPages, cmsPageSchema);
