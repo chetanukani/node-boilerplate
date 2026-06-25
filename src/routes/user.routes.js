@@ -21,6 +21,7 @@ import {
   forgotPasswordValidator,
   resetPasswordValidator,
 } from "../validators/user.validator.js";
+import versionMiddleware from "../middlewares/version.middlewares.js";
 
 const router = Router();
 
@@ -42,7 +43,8 @@ router
   .post(validateRequest(resetPasswordValidator), resetPassword);
 
 router.route("/simulate").post(verifyJWT, simulateNotification);
-router.route("/testing-app-setting").get(testingAppSetting);
+
+router.route("/testing-app-setting").get(versionMiddleware, testingAppSetting);
 
 router.route("/testing-socket-emit").get(testingSocketEmit);
 

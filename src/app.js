@@ -9,12 +9,12 @@ import morganMiddleware from "./logger/morgan.logger.js";
 import { ApiError } from "./utils/ApiError.js";
 import { StatusCodes } from "http-status-codes";
 import versionMiddleware from "./middlewares/version.middlewares.js";
-import appVersionRouter from "./routes/appVersion.routes.js";
 import healthRouter from "./routes/health.routes.js";
 import { env } from "./config/index.js";
 import { initializeSocketIO } from "./socket/index.js";
 import { errorHandler } from "./middlewares/error.middlewares.js";
 import userRouter from "./routes/user.routes.js";
+import adminRouter from "./routes/admin.routes.js";
 import categoryRouter from "./routes/category.routes.js";
 import productRouter from "./routes/product.routes.js";
 
@@ -70,8 +70,7 @@ app.use(morganMiddleware);
 
 app.use(healthRouter);
 
-app.use("/api/v1/app-versions", appVersionRouter);
-app.use("/api/v1", versionMiddleware);
+app.use("/api/v1/admin", adminRouter);
 app.use("/api/v1/users", userRouter);
 app.use("/api/v1/categories", categoryRouter);
 app.use("/api/v1/products", productRouter);
