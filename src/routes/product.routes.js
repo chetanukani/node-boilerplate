@@ -13,6 +13,7 @@ import {
   bulkCreateProductsValidator,
   createProductValidator,
 } from "../validators/product.validator.js";
+import { generatePdf } from "../controllers/products/pdf.controllers.js";
 
 const router = Router();
 
@@ -40,5 +41,7 @@ router.route("/").post(
   validateRequest(createProductValidator),
   createProduct
 );
+
+router.get("/generate-pdf", generatePdf);
 
 export default router;
