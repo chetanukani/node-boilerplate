@@ -18,10 +18,6 @@ pdfmake.setFonts(fonts);
 pdfmake.setUrlAccessPolicy(() => true);
 pdfmake.setLocalAccessPolicy(() => true);
 
-/**
- * Generate a sample PDF showing all available document elements.
- * @route GET /api/v1/pdf/generate
- */
 export const generatePdf = async (req, res, next) => {
   try {
     // 1x1 pixel solid red PNG as a visible placeholder for images
