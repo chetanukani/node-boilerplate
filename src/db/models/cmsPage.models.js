@@ -1,9 +1,9 @@
 import mongoose, { Schema } from "mongoose";
-import { TableNames } from "../../constants.js";
+import { TableFields, TableNames } from "../../constants.js";
 
 const cmsPageSchema = new Schema(
   {
-    slug: {
+    [TableFields.slug]: {
       type: String,
       required: true,
       unique: true,
@@ -11,12 +11,12 @@ const cmsPageSchema = new Schema(
       trim: true,
       index: true,
     },
-    title: {
+    [TableFields.title]: {
       type: String,
       required: true,
       trim: true,
     },
-    content: {
+    [TableFields.content]: {
       type: Map,
       of: String,
       required: true,

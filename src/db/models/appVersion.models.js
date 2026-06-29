@@ -1,8 +1,9 @@
 import mongoose, { Schema } from "mongoose";
+import { TableFields, TableNames } from "../../constants.js";
 
 const appVersionSchema = new Schema(
   {
-    platform: {
+    [TableFields.platform]: {
       type: String,
       required: true,
       lowercase: true,
@@ -10,17 +11,17 @@ const appVersionSchema = new Schema(
       unique: true,
     },
     // semantic version string representing the server's current required version
-    version: {
+    [TableFields.version]: {
       type: String,
       required: true,
       default: "0.0.0",
     },
     // when true and client's version < `version`, client must force update
-    forceUpdate: {
+    [TableFields.forceUpdate]: {
       type: Boolean,
       default: false,
     },
-    maintenance: {
+    [TableFields.maintenance]: {
       type: Boolean,
       default: false,
     },
@@ -28,4 +29,7 @@ const appVersionSchema = new Schema(
   { timestamps: true }
 );
 
-export const AppVersion = mongoose.model("app_versions", appVersionSchema);
+export const AppVersion = mongoose.model(
+  TableNames.AppVersion,
+  appVersionSchema
+);

@@ -30,7 +30,9 @@ async function getAllAppVersion(req, res, next) {
   const records = await AppVersionService.getAllPlatformConfig();
   return res
     .status(StatusCodes.OK)
-    .json(new ApiResponse(StatusCodes.OK, { records }, "Fetched"));
+    .json(
+      new ApiResponse(StatusCodes.OK, { records }, ResponseMessages.FETCHED)
+    );
 }
 
 export { updateOrAddAppSettings, getAllAppVersion };

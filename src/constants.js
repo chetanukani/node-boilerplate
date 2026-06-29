@@ -1,10 +1,10 @@
 /**
  * @type {{ ADMIN: "ADMIN"; USER: "USER"} as const}
  */
-export const UserRolesEnum = {
+export const UserRolesEnum = Object.freeze({
   ADMIN: "ADMIN",
   USER: "USER",
-};
+});
 
 export const AvailableUserRoles = Object.values(UserRolesEnum);
 
@@ -45,26 +45,24 @@ export const ChatEventEnum = Object.freeze({
 export const AvailableChatEvents = Object.values(ChatEventEnum);
 
 /** MongoDB collection names */
-export const TableNames = {
+export const TableNames = Object.freeze({
   User: "users",
   Category: "categories",
   Product: "products",
   Notification: "notifications",
   Session: "sessions",
   CMSPages: "cms_pages",
-};
+  AppVersion: "app_versions",
+});
 
 /**
  * Field keys used across models, services, and queries.
  * Add new fields here when introducing a model or projection.
  */
-export const TableFields = {
-  // Common
+export const TableFields = Object.freeze({
   ID: "_id",
   createdAt: "createdAt",
   updatedAt: "updatedAt",
-
-  // User
   username: "username",
   email: "email",
   role: "role",
@@ -96,10 +94,22 @@ export const TableFields = {
   platform: "platform",
   image: "image",
   mediaType: "mediaType",
-};
+  jti: "jti",
+  tokenHash: "tokenHash",
+  deviceId: "deviceId",
+  ip: "ip",
+  userAgent: "userAgent",
+  revoked: "revoked",
+  expiresAt: "expiresAt",
+  slug: "slug",
+  content: "content",
+  version: "version",
+  forceUpdate: "forceUpdate",
+  maintenance: "maintenance",
+});
 
 /** Shared validation / error messages */
-export const ValidationMessages = {
+export const ValidationMessages = Object.freeze({
   RecordNotFound: "Record not found",
   UserAlreadyExist: "User with email or username already exists",
   SomethingWentWrong: "Something went wrong",
@@ -116,10 +126,13 @@ export const ValidationMessages = {
   PasswordRequired: "Password is required",
   DevOnlyService: "This service is only available in the local environment",
   StripeNotEnabled: "Stripe payments are not enabled",
-};
+  UnderMaintenance:
+    "The app is currently undergoing maintenance. Please try again later!",
+  ForceUpdate: "Please update the app to continue using it",
+});
 
 /** Shared success response messages */
-export const ResponseMessages = {
+export const ResponseMessages = Object.freeze({
   CREATED: "Created successfully",
   UPDATED: "Updated successfully",
   DELETED: "Deleted successfully",
@@ -132,18 +145,18 @@ export const ResponseMessages = {
   PasswordResetEmailSent:
     "If an account exists, password reset instructions have been sent.",
   PasswordResetSuccess: "Password has been reset successfully",
-};
+});
 
-export const PlatformType = {
+export const PlatformType = Object.freeze({
   Android: "android",
   iOS: "ios",
-};
+});
 
-export const MediaTypes = {
+export const MediaTypes = Object.freeze({
   Image: 1,
   Audio: 2,
   Video: 3,
   Pdf: 4,
   Excel: 5,
   Doc: 6,
-};
+});
