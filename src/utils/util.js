@@ -1,4 +1,5 @@
 import crypto from "crypto";
+import moment from "moment";
 import { MediaTypes } from "../constants.js";
 
 const Util = class {
@@ -12,6 +13,35 @@ const Util = class {
 
   static wrapWithRegexQry(textStr = "") {
     return new RegExp(Util.escapeRegex(textStr));
+  }
+
+  static formatToDdMmYyyyWithTime(dateObj, utcOffset = 0) {
+    if (utcOffset) {
+      utcOffset = parseInt(utcOffset);
+    } else {
+      utcOffset = 0;
+    }
+    return moment(dateObj).utcOffset(-utcOffset).format("DD/MM/YYYY, hh:mm A"); //01/01/2021 00:00 AM
+  }
+
+  static formatDateWithDdMmmYyyy() {
+    return moment().format("DD-MMM-YYYY");
+  }
+
+  static removeTime(dateObj) {
+    if (!dateObj) {
+      return;
+    }
+    let year = dateObj.getUTCFullYear();
+    let month = dateObj.getUTCMonth() + 1;
+    let dt = dateObj.getUTCDate();
+    if (dt < 10) {
+      dt = "0" + dt;
+    }
+    if (month < 10) {
+      month = "0" + month;
+    }
+    return year + "-" + month + "-" + dt;
   }
 
   /**
