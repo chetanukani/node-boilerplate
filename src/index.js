@@ -1,3 +1,9 @@
+import { webcrypto } from "node:crypto";
+
+if (!globalThis.crypto) {
+  globalThis.crypto = webcrypto;
+}
+
 import "./config/index.js";
 import { httpServer } from "./app.js";
 import connectDB, { disconnectDB } from "./db/index.js";
