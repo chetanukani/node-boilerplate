@@ -2,8 +2,6 @@
 logs
 *.log
 npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
 
 # Runtime data
 pids
@@ -15,9 +13,6 @@ node_modules/
 
 # Compiled native addons (e.g. bcrypt)
 build/Release
-
-# Yarn integrity file
-.yarn-integrity
 
 # dotenv environment variable files
 .env

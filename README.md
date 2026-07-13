@@ -5,7 +5,7 @@ Production-oriented Express + MongoDB API boilerplate with Zod validation, centr
 ## Requirements
 
 - Node.js **24+**
-- Yarn (project uses `yarn.lock`)
+- NPM (project uses `package-lock.json`)
 - MongoDB 6+
 
 ## Quick start
@@ -14,8 +14,8 @@ Production-oriented Express + MongoDB API boilerplate with Zod validation, centr
 cp .env.sample .env
 # Edit MONGODB_URI, ACCESS_TOKEN_SECRET, REFRESH_TOKEN_SECRET
 
-yarn install
-yarn dev
+npm install
+npm run dev
 ```
 
 Server: `http://localhost:8080`  
@@ -23,12 +23,12 @@ Health: `GET /health` | Readiness: `GET /ready`
 
 ## Scripts
 
-| Script        | Description        |
-| ------------- | ------------------ |
-| `yarn start`  | Production start   |
-| `yarn dev`    | Nodemon dev server |
-| `yarn lint`   | ESLint             |
-| `yarn format` | Prettier write     |
+| Script           | Description        |
+| ---------------- | ------------------ |
+| `npm start`      | Production start   |
+| `npm run dev`    | Nodemon dev server |
+| `npm run lint`   | ESLint             |
+| `npm run format` | Prettier write     |
 
 ## Configuration
 
@@ -78,22 +78,7 @@ All errors return a consistent shape:
 
 When domains grow, colocate under `src/modules/<domain>/`. See [`src/modules/README.md`](./src/modules/README.md).
 
-## Docker
-
-### Production image
-
-```bash
-docker build -t node-boilerplate .
-docker run --env-file .env -p 8080:8080 node-boilerplate
-```
-
-### Local MongoDB
-
-```bash
-docker compose up -d
-```
-
-Starts MongoDB on `localhost:27017` (matches `.env.sample`). Run the app on your host with `yarn dev`.
+Starts MongoDB on `localhost:27017` (matches `.env.sample`). Run the app on your host with `npm run dev`.
 
 ## Security notes
 
